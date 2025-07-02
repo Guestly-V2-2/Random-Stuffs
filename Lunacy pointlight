@@ -1,0 +1,21 @@
+local cue = Instance.new("PointLight")
+	cue.Parent = workspace.CurrentRooms:FindFirstChild(game.ReplicatedStorage.GameData.LatestRoom.Value).Door.Door
+  cue.Name = "Light"
+	cue.Color = Color3.fromRGB(146, 3, 255)
+  cue.Brightness = 0
+  cue.Range = 0
+local TweenService = game:GetService("TweenService")
+local TW = TweenService:Create(workspace.CurrentRooms:FindFirstChild(game.ReplicatedStorage.GameData.LatestRoom.Value).Door.Door.Light, TweenInfo.new(4),{Range = 7})
+TW:Play()
+local TweenService = game:GetService("TweenService")
+local TW = TweenService:Create(workspace.CurrentRooms:FindFirstChild(game.ReplicatedStorage.GameData.LatestRoom.Value).Door.Door.Light, TweenInfo.new(4),{Brightness = 10})
+TW:Play()
+game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+local TweenService = game:GetService("TweenService")
+local TW = TweenService:Create(cue, TweenInfo.new(4),{Range = 0})
+TW:Play()
+local TweenService = game:GetService("TweenService")
+local TW = TweenService:Create(cue, TweenInfo.new(4),{Brightness = 0})
+TW:Play()
+wait(4)
+  cue:Destroy()
