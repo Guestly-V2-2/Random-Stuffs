@@ -1,0 +1,37 @@
+coroutine.wrap(function()
+    local LightReplaceModel = game:GetObjects("rbxassetid://137958338882045")[1]
+    if not LightReplaceModel then return end
+
+    local function replaceLights()
+        local latestRoomId = game:GetService("ReplicatedStorage").GameData.LatestRoom.Value
+        local room = workspace.CurrentRooms:FindFirstChild(latestRoomId)
+        if not room then return end
+
+        local fixtures = room:FindFirstChild("Assets") and room.Assets:FindFirstChild("Light_Fixtures")
+        if not fixtures then return end
+
+        for _, v in pairs(fixtures:GetDescendants()) do
+            if v:IsA("Model") and (v.Name == "LightStand" or v.Name == "LightStandSingle") then
+                local pivot = v:GetPivot()
+                v:Destroy()
+
+                local newLight = LightReplaceModel:Clone()
+                for _, part in pairs(newLight:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.Anchored = true
+                    end
+                end
+
+                newLight:PivotTo(pivot)
+                newLight.Parent = fixtures
+            end
+        end
+    end
+
+    replaceLights()
+
+    game.ReplicatedStorage.GameData.LatestRoom.Changed:Connect(function()
+        task.wait(0.5)
+        replaceLights()
+    end)
+end)()
