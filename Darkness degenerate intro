@@ -1,0 +1,25 @@
+game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Darkness"
+screenGui.Parent = playerGui
+screenGui.IgnoreGuiInset = true
+
+local red = Instance.new("ImageLabel")
+red.Name = "DarknessText"
+red.Size = UDim2.new(1, 0, 1, 0)
+red.BackgroundTransparency = 1 -- Make the background fully transparent
+red.Image = "rbxassetid://93080788204474" -- Set the image using a random Image ID
+red.ImageTransparency = 1
+red.Parent = screenGui
+local TweenService = game:GetService("TweenService")
+local TW = TweenService:Create(game.Players.LocalPlayer.PlayerGui.Darkness.DarknessText, TweenInfo.new(5),{ImageTransparency = 0})
+TW:Play()
+wait(8)
+local TweenService = game:GetService("TweenService")
+local TW = TweenService:Create(game.Players.LocalPlayer.PlayerGui.Darkness.DarknessText, TweenInfo.new(5),{ImageTransparency = 1})
+TW:Play()
+wait(5)
+game.Players.LocalPlayer.PlayerGui.Darkness:Destroy()
