@@ -4,7 +4,7 @@ game:GetService("Players").LocalPlayer.PlayerGui.MainUI.CheckPlatform.Input.pc:D
 game:GetService("Players").LocalPlayer.PlayerGui.MainUI.CheckPlatform.Input.mobile.Icon:Destroy()
 game:GetService("Players").LocalPlayer.PlayerGui.MainUI.CheckPlatform.Input.mobile.Text = "Loading"
 game:GetService("Players").LocalPlayer.PlayerGui.MainUI.CheckPlatform.Desc.Text = "Script is loading. Hold on!"
-game:GetService("Players").LocalPlayer.PlayerGui.MainUI.CheckPlatform.Title.Text = "Lunacy Mode Remastered"
+game:GetService("Players").LocalPlayer.PlayerGui.MainUI.CheckPlatform.Title.Text = "Lunacy Mode"
 wait(3)
 game:GetService("Players").LocalPlayer.PlayerGui.MainUI.CheckPlatform.Input.mobile.Text = "Loading: 5%"
 wait(0.2)
