@@ -45,7 +45,7 @@ local red = Instance.new("ImageLabel")
 red.Name = "Hardcore"
 red.Size = UDim2.new(1, 70, 1, 30)
 red.BackgroundTransparency = 1 -- Make the background fully transparent
-red.Image = "rbxassetid://107415927118524" -- Set the image using a random Image ID
+red.Image = "rbxassetid://123832742457015" -- Set the image using a random Image ID
 red.ImageTransparency = 0
 red.Parent = screenGui
 wait(4)
@@ -95,28 +95,3 @@ caption.TextColor3 = Color3.fromRGB(169, 3, 252)
 require(game.Players.LocalPlayer.PlayerGui.MainUI.Initiator.Main_Game).caption("Are you ready for this madness?",true)
 wait(5)
 require(game.Players.LocalPlayer.PlayerGui.MainUI.Initiator.Main_Game).remind("This mode contains sudden jumpscares", true)
-game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
-local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "Title"
-screenGui.Parent = playerGui
-screenGui.IgnoreGuiInset = true
-
-local red = Instance.new("ImageLabel")
-red.Name = "TitleUi"
-red.Size = UDim2.new(1, 0, 1, 0)
-red.BackgroundTransparency = 1 -- Make the background fully transparent
-red.Image = "rbxassetid://123832742457015" -- Set the image using a random Image ID
-red.ImageTransparency = 1
-red.Parent = screenGui
-local TweenService = game:GetService("TweenService")
-local TW = TweenService:Create(game.Players.LocalPlayer.PlayerGui.Title.TitleUi, TweenInfo.new(5),{ImageTransparency = 0})
-TW:Play()
-wait(6)
-local TweenService = game:GetService("TweenService")
-local TW = TweenService:Create(game.Players.LocalPlayer.PlayerGui.Title.TitleUi, TweenInfo.new(5),{ImageTransparency = 1})
-TW:Play()
-wait(6)
-game.Players.LocalPlayer.PlayerGui.Title:Destroy()
