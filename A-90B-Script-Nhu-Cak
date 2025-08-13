@@ -730,7 +730,7 @@ local startX = hrp.Position.X
 spawn(function()
 	for i = 1, showTime*10 do
 		task.wait(0.1)
-		if hrp.Position.X < startX + 2 then
+		if hrp.Position.X < startX - 2 then
 			movedLeft = true
 			break
 		end
@@ -739,8 +739,7 @@ end)
 
 task.wait(showTime)
 
-if not movedLeft then
-	if hum and hum.Health > 0 then
+if not movedLeft and hum and hum.Health > 0 then
    function GitAud(soundgit,filename)
     SoundName=tostring(SoundName)
     local url=soundgit
@@ -871,7 +870,6 @@ tween:Create(game.Lighting.MainColorCorrection, TweenInfo.new(2.5), {Contrast = 
 local TweenService = game:GetService("TweenService")
 local TW = TweenService:Create(game.Lighting.MainColorCorrection, TweenInfo.new(3),{TintColor = Color3.fromRGB(255, 255, 255)})
 TW:Play()
-	end
 end
 
 wait(0.1)
@@ -913,7 +911,7 @@ local startX = hrp.Position.X
 spawn(function()
 	for i = 1, showTime*10 do
 		task.wait(0.1)
-		if hrp.Position.X < startX + 2 then
+		if hrp.Position.X < startX - 2 then
 			movedLeft = true
 			break
 		end
@@ -922,8 +920,7 @@ end)
 
 task.wait(showTime)
 
-if not movedLeft then
-	if hum and hum.Health > 0 then
+if not movedLeft and hum and hum.Health > 0 then
    function GitAud(soundgit,filename)
     SoundName=tostring(SoundName)
     local url=soundgit
@@ -1054,7 +1051,6 @@ tween:Create(game.Lighting.MainColorCorrection, TweenInfo.new(2.5), {Contrast = 
 local TweenService = game:GetService("TweenService")
 local TW = TweenService:Create(game.Lighting.MainColorCorrection, TweenInfo.new(3),{TintColor = Color3.fromRGB(255, 255, 255)})
 TW:Play()
-	end
 end
 
 wait(0.1)
