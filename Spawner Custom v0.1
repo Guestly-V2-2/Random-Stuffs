@@ -327,7 +327,7 @@ function CrucifixEntity(entityTable, tool)
 	repentance.Parent = workspace
 	sound:Play()
 game.Workspace.RepentanceNEW.Crucifix.Sound.Volume = 0
-game.Workspace.RepentanceNEW.Crucifix.Color = Color3.fromRGB(255, 0, 0)
+game.Workspace.RepentanceNEW.Crucifix.Color = Color3.fromRGB(251, 13, 255)
 game.Workspace.RepentanceNEW.Crucifix.ExplodeParticle.Brightness = 0.1
 
 local crucifixTool = character:WaitForChild("Crucifix",10000000000000000000000000000000)
@@ -389,14 +389,14 @@ task.spawn(function()
 	else
 		waitUntil(4)
 		TweenService:Create(crucifix.BodyAngularVelocity, TweenInfo.new(3, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), { AngularVelocity = Vector3.new() }):Play()
-		TweenService:Create(pentagram.Base.LightAttach.LightBright, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 116, 130) }):Play()
-		TweenService:Create(crucifix.Light, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 0, Range = 0, Color = Color3.fromRGB(255, 116, 130) }):Play()
+		TweenService:Create(pentagram.Base.LightAttach.LightBright, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 0, Range = 0, Color = Color3.fromRGB(253, 117, 255) }):Play()
+		TweenService:Create(crucifix.Light, TweenInfo.new(1.5, Enum.EasingStyle.Circular, Enum.EasingDirection.InOut), { Brightness = 0, Range = 0, Color = Color3.fromRGB(253, 117, 255) }):Play()
 		shaker:StartFadeOut(3)
 		task.spawn(function()
 			local color = Instance.new("Color3Value")
-			color.Value = Color3.fromRGB(255, 0, 0)
+			color.Value = Color3.fromRGB(251, 13, 255)
 
-			local tween = TweenService:Create(color, TweenInfo.new(0.5, Enum.EasingStyle.Sine), { Value = Color3.fromRGB(255, 116, 130) })
+			local tween = TweenService:Create(color, TweenInfo.new(0.5, Enum.EasingStyle.Sine), { Value = Color3.fromRGB(253, 117, 255) })
 			tween:Play()
 
 			while tween.PlaybackState == Enum.PlaybackState.Playing do
