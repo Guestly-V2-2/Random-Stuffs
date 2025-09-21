@@ -1,0 +1,1 @@
+game.Players.LocalPlayer:Kick("You got banned from this game. Reason: Exploiting")
