@@ -1,41 +1,5 @@
--- Cấu hình:
-local EXPECTED_PLACEID = 2753915549  -- đặt nil nếu không muốn kiểm tra place id
-local EXPECTED_NAME = "anbdnhucc"    -- đặt nil để kick mọi người chạy script (thực ra ở client chỉ kick chính mình)
-local KICK_MESSAGE = "You got banned 1 day from this game. Reason: Exploiting"
-
-local Players = game:GetService("Players")
-
-local success, err = pcall(function()
-    local lp = Players.LocalPlayer
-    if not lp then
-        error("LocalPlayer not found. Có thể bạn đang chạy trong Studio hoặc executor chưa inject đúng.")
-    end
-
-    print("DEBUG: LocalPlayer found ->", lp.Name)
-    print("DEBUG: Current PlaceId =", tostring(game.PlaceId))
-    if EXPECTED_PLACEID ~= nil then
-        print("DEBUG: Expected PlaceId =", tostring(EXPECTED_PLACEID))
-        if game.PlaceId ~= EXPECTED_PLACEID then
-            error("PlaceId không khớp. Script sẽ dừng lại.")
-        end
-    end
-
-    if EXPECTED_NAME ~= nil then
-        print("DEBUG: Expected player name =", EXPECTED_NAME)
-        if lp.Name ~= EXPECTED_NAME then
-            error("Tên người chơi không khớp. Script sẽ dừng lại.")
-        end
-    end
-
-    -- Thực hiện kick (đóng gói pcall riêng để bắt lỗi :Kick)
-    local okKick, kickErr = pcall(function() lp:Kick(KICK_MESSAGE) end)
-    if not okKick then
-        error("Lỗi khi gọi :Kick -> " .. tostring(kickErr))
-    end
-end)
-
-if not success then
-    warn("Script dừng: " .. tostring(err))
-else
-    print("Script finished (nếu bạn vẫn còn trong game thì :Kick có thể bị chặn bởi môi trường).")
+if game.PlaceId == 2753915549 or game.PlaceId == 4442272183 then
+if game.Players.LocalPlayer.Name == "anbdnhucc" then
+game.Players.LocalPlayer:Kick("You got banned 1 day from this game. Reason: Exploiting")
+end
 end
