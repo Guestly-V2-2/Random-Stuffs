@@ -1,5 +1,5 @@
 if game.PlaceId == 2753915549 or game.PlaceId == 4442272183 then
 if game.Players.LocalPlayer.Name == "anbdnhucc" then
-game.Players.LocalPlayer:Kick("You got banned 1 day from this game. Reason: Exploiting")
+game.Players.LocalPlayer:Kick("We detected a third-party software in your device, It breaks roblox and our games' rules. Please remove your cheats to continue playing")
 end
 end
