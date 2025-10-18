@@ -1,0 +1,212 @@
+-- 🧠 SANITY SYSTEM + ENTITY SPAWNS (FULL)
+-- By TheLastOne5778
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+-- SETTINGS
+local sanity = 100
+local sanityDecreaseRate = 1
+local sanityIncreaseOnDoor = 10
+local insane = false
+local forceSpawnEntities = false
+local activeEntities = {}
+local normalLighting = {
+	Ambient = Lighting.Ambient,
+	FogColor = Lighting.FogColor,
+	Brightness = Lighting.Brightness
+}
+
+-- SOUNDS
+local screamSoundId = "rbxassetid://8760085843"
+local footstepEchoId = "rbxassetid://9118823270"
+
+-- GUI
+local gui = Instance.new("ScreenGui", PlayerGui)
+gui.Name = "SanityUI"
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 220, 0, 30)
+frame.Position = UDim2.new(1, -240, 1, -80)
+frame.BackgroundColor3 = Color3.fromRGB(25, 0, 0)
+frame.BorderSizePixel = 0
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+
+local bar = Instance.new("Frame", frame)
+bar.Size = UDim2.new(1, 0, 1, 0)
+bar.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+bar.BorderSizePixel = 0
+Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 10)
+
+local label = Instance.new("TextLabel", frame)
+label.Size = UDim2.new(1, 0, 1, 0)
+label.BackgroundTransparency = 1
+label.Font = Enum.Font.GothamBold
+label.TextColor3 = Color3.new(1, 1, 1)
+label.TextScaled = true
+label.Text = "Oxygen: 100%"
+
+local vignette = Instance.new("Frame", gui)
+vignette.Size = UDim2.new(1.2, 0, 1.2, 0)
+vignette.Position = UDim2.new(-0.1, 0, -0.1, 0)
+vignette.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+vignette.BackgroundTransparency = 1
+vignette.ZIndex = 10
+
+-- FUNCTIONS
+local function playSound(id, vol)
+	local s = Instance.new("Sound")
+	s.SoundId = "rbxassetid://" .. tostring(id):match("%d+")
+	s.Volume = vol or 1
+	s.Parent = workspace
+	s:Play()
+	game:GetService("Debris"):AddItem(s, 10)
+end
+
+local function shakeScreen()
+	local cam = workspace.CurrentCamera
+	local original = cam.CFrame
+	for i = 1, 10 do
+		cam.CFrame = original * CFrame.new(
+			math.random(-1, 1) * 0.15,
+			math.random(-1, 1) * 0.15,
+			math.random(-1, 1) * 0.15
+		)
+		task.wait(0.05)
+	end
+	cam.CFrame = original
+end
+
+local function setInsanity(on)
+	if on and not insane then
+		insane = true
+		playSound(screamSoundId, 3)
+		for _, light in pairs(workspace:GetDescendants()) do
+			if light:IsA("PointLight") or light:IsA("SpotLight") or light:IsA("SurfaceLight") then
+				light.Color = Color3.fromRGB(0,0,0)
+				light.Brightness = 6
+			end
+		end
+		Lighting.Ambient = Color3.fromRGB(0,0,0)
+		Lighting.FogColor = Color3.fromRGB(0,0,0)
+		Lighting.Brightness = 0.4
+	elseif not on and insane then
+		insane = false
+		for _, light in pairs(workspace:GetDescendants()) do
+			if light:IsA("PointLight") or light:IsA("SpotLight") or light:IsA("SurfaceLight") then
+				light.Color = Color3.fromRGB(255,255,255)
+			end
+		end
+		Lighting.Ambient = normalLighting.Ambient
+		Lighting.FogColor = normalLighting.FogColor
+		Lighting.Brightness = normalLighting.Brightness
+	end
+end
+
+-- ENTITY LINKS
+local someoneLink = "https://raw.githubusercontent.com/Guestly-V2-2/Random-Stuffs/refs/heads/main/Tuhuy"
+local polarBearLink = "https://raw.githubusercontent.com/Guestly-V2-2/Random-Stuffs/refs/heads/main/OxygenDeathHint"
+local scaryLinks = {
+	"",
+	"",
+	""
+}
+local mentalLink = ""
+
+local spawnCounts = {["PolarBear"]=3,["Scary1"]=5,["Scary2"]=5,["Scary3"]=5}
+local entityNames = {[polarBearLink]="PolarBear",[scaryLinks[1]]="Scary1",[scaryLinks[2]]="Scary2",[scaryLinks[3]]="Scary3"}
+
+-- SPAWN FUNCTIONS
+local function destroyAllEntities()
+	for _, e in pairs(activeEntities) do
+		if e and e.Destroy then pcall(function() e:Destroy() end) end
+	end
+	activeEntities = {}
+end
+
+local function spawnSomeoneFirst()
+	local success, entity = pcall(function() return loadstring(game:HttpGet(someoneLink))() end)
+	if success and entity then table.insert(activeEntities, entity) end
+end
+
+local function spawnRandomEntity()
+	local available = {}
+	for link,name in pairs(entityNames) do
+		if spawnCounts[name] and spawnCounts[name] > 0 then table.insert(available,link) end
+	end
+	if #available==0 then return end
+	local choice = available[math.random(1,#available)]
+	local name = entityNames[choice]
+	local success, entity = pcall(function() return loadstring(game:HttpGet(choice))() end)
+	if success and entity then table.insert(activeEntities, entity) end
+	spawnCounts[name] = spawnCounts[name]-1
+	if success and entity then
+		if entity.Destroying then
+			local finished=false
+			entity.Destroying:Connect(function() finished=true end)
+			repeat task.wait(0.1) until finished
+		else
+			task.wait(5)
+		end
+	end
+	spawnRandomEntity()
+end
+
+local function spawnMentalRepeatedly()
+	local spawned=0
+	while spawned<5 do
+		local success,entity = pcall(function() return loadstring(game:HttpGet(mentalLink))() end)
+		if success and entity then table.insert(activeEntities, entity) end
+		spawned = spawned + 1
+		task.wait(math.random(2,3))
+	end
+end
+
+
+task.spawn(function()
+	local latestRoom = ReplicatedStorage:WaitForChild("GameData"):WaitForChild("LatestRoom")
+	while task.wait(1) do
+		
+		if latestRoom.Value ~= 0 then
+			sanity = math.clamp(sanity - sanityDecreaseRate, 0, 100)
+		end
+		bar.Size = UDim2.new(sanity/100,0,1,0)
+		label.Text = "Oxygen: "..math.floor(sanity).."%"
+
+		if sanity <= 20 and sanity > 0 then
+			TweenService:Create(vignette,TweenInfo.new(0.5),{BackgroundTransparency=0.4}):Play()
+			shakeScreen()
+		else
+			TweenService:Create(vignette,TweenInfo.new(1),{BackgroundTransparency=1}):Play()
+		end
+
+		if sanity <= 10 and sanity>0 then playSound(footstepEchoId,1.5) end
+
+		if sanity <= 0 then
+			setInsanity(true)
+			if not forceSpawnEntities then
+				forceSpawnEntities=true
+				spawnSomeoneFirst()
+				task.spawn(spawnRandomEntity)
+				task.spawn(spawnMentalRepeatedly)
+			end
+		elseif sanity > 0 and forceSpawnEntities then
+			destroyAllEntities()
+			setInsanity(false)
+			forceSpawnEntities=false
+		end
+	end
+end)
+
+local latestRoom = ReplicatedStorage:WaitForChild("GameData"):WaitForChild("LatestRoom")
+latestRoom.Changed:Connect(function()
+	sanity = math.clamp(sanity + sanityIncreaseOnDoor,0,100)
+	bar.Size = UDim2.new(sanity/100,0,1,0)
+	label.Text = "Oxygen: "..math.floor(sanity).."%"
+end)
