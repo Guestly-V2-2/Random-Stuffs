@@ -1,0 +1,97 @@
+--// 🧠 Mental Note GUI by TheLastOne5778
+local player = game.Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+-- 📌 Small clickable frame (on the left)
+local Frame = Instance.new("TextButton")
+Frame.Size = UDim2.new(0, 180, 0, 50)
+Frame.Position = UDim2.new(0, 15, 0.5, -25)
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 40)
+Frame.BackgroundTransparency = 0.15
+Frame.Text = ""
+Frame.Parent = PlayerGui:WaitForChild("ScreenGui", 1) or Instance.new("ScreenGui", PlayerGui)
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = Frame
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Size = UDim2.new(1, -10, 1, -10)
+TextLabel.Position = UDim2.new(0, 5, 0, 5)
+TextLabel.BackgroundTransparency = 1
+TextLabel.TextWrapped = true
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextColor3 = Color3.fromRGB(0, 0, 255)
+TextLabel.TextScaled = true
+TextLabel.Text = "Read or you gay"
+TextLabel.Parent = Frame
+
+-- 📖 Note GUI
+local NoteGui = Instance.new("ScreenGui")
+NoteGui.Name = "MentalNote"
+NoteGui.ResetOnSpawn = false
+NoteGui.IgnoreGuiInset = true
+NoteGui.Parent = PlayerGui
+NoteGui.Enabled = false
+
+local NoteFrame = Instance.new("Frame")
+NoteFrame.Size = UDim2.new(0, 420, 0, 280)
+NoteFrame.Position = UDim2.new(0.5, -210, 0.5, -140)
+NoteFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 30)
+NoteFrame.BackgroundTransparency = 0.15
+NoteFrame.BorderSizePixel = 0
+NoteFrame.Parent = NoteGui
+
+local NoteCorner = Instance.new("UICorner")
+NoteCorner.CornerRadius = UDim.new(0, 15)
+NoteCorner.Parent = NoteFrame
+
+local NoteText = Instance.new("TextLabel")
+NoteText.Size = UDim2.new(1, -30, 1, -30)
+NoteText.Position = UDim2.new(0, 15, 0, 15)
+NoteText.BackgroundTransparency = 1
+NoteText.TextWrapped = true
+NoteText.TextScaled = true
+NoteText.Font = Enum.Font.Garamond
+NoteText.TextColor3 = Color3.fromRGB(240, 240, 255)
+NoteText.Text = [[
+Oh hi you dumbass -_-
+
+Looks like you accidently fell into our dimensions, you won't know the rules..
+
+It feels like a hotel, but something is wrong.
+You don’t what is happening, we are finding you, keep safe >:^
+
+You won't escape this madness, i bet, because they are still finding you to the end until they caught you, you can't run away from them HAHAHHAHAHAHAHAH >:D
+]]
+NoteText.Parent = NoteFrame
+
+-- 🔘 Close button
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 100, 0, 35)
+CloseBtn.Position = UDim2.new(0.5, -50, 1, -45)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 100)
+CloseBtn.Text = "Close"
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextColor3 = Color3.fromRGB(0, 0, 255)
+CloseBtn.TextScaled = true
+CloseBtn.Parent = NoteFrame
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 10)
+BtnCorner.Parent = CloseBtn
+
+CloseBtn.MouseButton1Click:Connect(function()
+	NoteGui.Enabled = false
+end)
+
+-- 🔊 Sound + show note
+Frame.MouseButton1Click:Connect(function()
+	local sound = Instance.new("Sound")
+	sound.SoundId = "rbxassetid://9125672852" -- subtle paper sound
+	sound.Volume = 1
+	sound.Parent = workspace
+	sound:Play()
+	game:GetService("Debris"):AddItem(sound, 3)
+	NoteGui.Enabled = true
+end)
