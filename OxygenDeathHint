@@ -1,0 +1,7 @@
+firesignal(game.ReplicatedStorage.RemotesFolder.DeathHint.OnClientEvent,
+                                        {"Well..","I know what happened",
+                                        "You got no changes","Can't even keep your oxygen",
+                                        "You can't do anything better than dying, i bet."},
+                                        "Blue")
+
+game.ReplicatedStorage.GameStats["Player_".. game.Players.LocalPlayer.Name].Total.DeathCause.Value = "Ran out of Oxygen"
