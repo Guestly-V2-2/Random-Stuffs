@@ -83,7 +83,7 @@ Camera.ChildAdded:Connect(
 
         local CustomMusic = getGitSoundId("https://github.com/Guestly-Second-Account/DOORS/raw/refs/heads/main/lv_0_20251231183645.mp3", "Darkness")
         CustomMusic.Parent = SoundService
-        CustomMusic.Looped = false
+        CustomMusic.Looped = true
         CustomMusic:Play()
     end
 )
