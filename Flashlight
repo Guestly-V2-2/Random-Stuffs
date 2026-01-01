@@ -1,0 +1,77 @@
+-- WORKING Flashlight Script (Forward Only)
+-- Executor / Client-side
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local head = char:WaitForChild("Head")
+local camera = workspace.CurrentCamera
+
+-- XÓA ĐÈN + SOUND CŨ (nếu có)
+for _, v in pairs(head:GetChildren()) do
+    if v:IsA("SpotLight") or v:IsA("Sound") or v:IsA("Attachment") then
+        v:Destroy()
+    end
+end
+
+-- ATTACHMENT
+local att = Instance.new("Attachment")
+att.Name = "FlashlightAttachment"
+att.Parent = head
+
+-- SPOTLIGHT (ĐÈN PIN)
+local light = Instance.new("SpotLight")
+light.Parent = att
+light.Name = "Flashlight"
+light.Color = Color3.fromRGB(255,255,255)
+light.Brightness = 2
+light.Range = 28
+light.Angle = 50
+light.Shadows = false
+light.Enabled = true
+
+-- SOUND TRỤC TRẶC (BẠN TỰ GẮN ID)
+local flickerSound = Instance.new("Sound")
+flickerSound.Parent = head
+flickerSound.Volume = 0.9
+-- flickerSound.SoundId = "rbxassetid://99071431420752"
+
+-- THEO HƯỚNG CAMERA (FIX CHUẨN)
+RunService.RenderStepped:Connect(function()
+    if camera and att then
+        att.WorldCFrame = CFrame.lookAt(
+            head.Position,
+            head.Position + camera.CFrame.LookVector
+        )
+    end
+end)
+
+-- NHẤP NHÁY
+local function flicker()
+    local times = math.random(2,3)
+
+    if flickerSound.SoundId ~= "" then
+        flickerSound:Play()
+    end
+
+    for i = 1, times do
+        light.Enabled = false
+        task.wait(0.07)
+        light.Enabled = true
+        task.wait(0.1)
+    end
+end
+
+-- RANDOM TRỤC TRẶC
+task.spawn(function()
+    while light and light.Parent do
+        task.wait(math.random(20,30))
+        if light and light.Parent then
+            flicker()
+        end
+    end
+end)
+
+print("✅ Flashlight working")
