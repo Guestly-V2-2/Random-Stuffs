@@ -1,0 +1,76 @@
+-- ================= CLEAN CONFIG =================
+local UNIQUE_GUI_NAME = "TypewriterSubtitle_CLEAN"
+
+local TextToShow = "Welcome to The Hotel."
+local TypingSpeed = 0.05
+local DeleteSpeed = 0.05
+local WaitBeforeDelete = 3
+
+local TypingSoundId = "rbxassetid://6042053626"
+-- =================================================
+
+local CoreGui = game:GetService("CoreGui")
+
+-- 🔥 XOÁ GUI CŨ NẾU CÒN SÓT
+pcall(function()
+	if CoreGui:FindFirstChild(UNIQUE_GUI_NAME) then
+		CoreGui[UNIQUE_GUI_NAME]:Destroy()
+	end
+end)
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = UNIQUE_GUI_NAME
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Parent = ScreenGui
+TextLabel.Size = UDim2.new(0.9, 0, 0.18, 0)
+TextLabel.Position = UDim2.new(0.05, 0, 0.75)
+TextLabel.BackgroundTransparency = 1
+TextLabel.Text = ""
+TextLabel.TextWrapped = true
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextScaled = false
+TextLabel.TextSize = 30
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextStrokeTransparency = 0
+
+-- 🔊 SOUND (đặt TRONG GUI để destroy cùng)
+local Sound = Instance.new("Sound")
+Sound.SoundId = TypingSoundId
+Sound.Volume = 1
+Sound.Parent = ScreenGui
+
+-- ===== HIỆN CHỮ =====
+for i = 1, #TextToShow do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(TypingSpeed)
+end
+
+-- ⏳ ĐỢI
+task.wait(WaitBeforeDelete)
+
+-- ===== XOÁ CHỮ NGƯỢC =====
+for i = #TextToShow, 0, -1 do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(DeleteSpeed)
+end
+
+-- 🧹 CLEANUP TUYỆT ĐỐI
+pcall(function()
+	TextLabel.Text = ""
+	Sound:Stop()
+	Sound:Destroy()
+	TextLabel:Destroy()
+	ScreenGui:Destroy()
+end)
+
+-- 💀 SCRIPT KẾT THÚC – KHÔNG CÒN GÌ TỒN TẠI
