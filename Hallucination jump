@@ -1,0 +1,371 @@
+game.Lighting.MainColorCorrection.TintColor = Color3.fromRGB(0, 0, 0)
+wait(4)
+
+-- ================= CONFIG =================
+local UNIQUE_GUI_NAME = "TypewriterSubtitle_AlwaysShake"
+local TextToShow = "HeLlO"
+local TypingSpeed = 0.05
+local DeleteSpeed = 0.04
+local WaitBeforeDelete = 2
+local TypingSoundId = "rbxassetid://9083627113"
+local ShakeMagnitude = 3 -- cường độ rung
+local ShakeSpeed = 0.03 -- tốc độ cập nhật vị trí
+-- ============================================
+
+local CoreGui = game:GetService("CoreGui")
+
+-- CLEAN GUI CŨ
+pcall(function()
+	if CoreGui:FindFirstChild(UNIQUE_GUI_NAME) then
+		CoreGui[UNIQUE_GUI_NAME]:Destroy()
+	end
+end)
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = UNIQUE_GUI_NAME
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Parent = ScreenGui
+TextLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5) -- set trọng tâm
+TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0) -- center màn hình
+TextLabel.BackgroundTransparency = 1
+TextLabel.Text = ""
+TextLabel.TextWrapped = true
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextScaled = false
+TextLabel.TextSize = 30
+TextLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- chữ đỏ
+TextLabel.TextStrokeTransparency = 0
+
+-- Sound
+local Sound = Instance.new("Sound")
+Sound.SoundId = TypingSoundId
+Sound.Volume = 1
+Sound.Parent = ScreenGui
+
+-- ===== HIỆU ỨNG RUNG LUÔN LUÔN (KHÔNG DỪNG) =====
+spawn(function()
+	while true do
+		local x = math.random(-ShakeMagnitude, ShakeMagnitude)
+		local y = math.random(-ShakeMagnitude, ShakeMagnitude)
+		TextLabel.Position = UDim2.new(0.5, x, 0.5, y)
+		task.wait(ShakeSpeed)
+	end
+end)
+
+-- ===== HIỆN CHỮ (TYPEWRITER) =====
+for i = 1, #TextToShow do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(TypingSpeed)
+end
+
+-- ⏳ ĐỢI 3 GIÂY
+task.wait(WaitBeforeDelete)
+
+-- ===== XOÁ CHỮ NGƯỢC (VẪN RUNG) =====
+for i = #TextToShow, 0, -1 do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(DeleteSpeed)
+end
+
+-- CLEANUP TUYỆT ĐỐI
+pcall(function()
+	TextLabel.Text = ""
+	Sound:Stop()
+	Sound:Destroy()
+	TextLabel:Destroy()
+	ScreenGui:Destroy()
+end)
+
+wait(1)
+
+-- ================= CONFIG =================
+local UNIQUE_GUI_NAME = "TypewriterSubtitle_AlwaysShake"
+local TextToShow = "Do YoU eVeN kNoW wHeRe YoU aRe¿"
+local TypingSpeed = 0.05
+local DeleteSpeed = 0.04
+local WaitBeforeDelete = 3
+local TypingSoundId = "rbxassetid://9083627113"
+local ShakeMagnitude = 3 -- cường độ rung
+local ShakeSpeed = 0.03 -- tốc độ cập nhật vị trí
+-- ============================================
+
+local CoreGui = game:GetService("CoreGui")
+
+-- CLEAN GUI CŨ
+pcall(function()
+	if CoreGui:FindFirstChild(UNIQUE_GUI_NAME) then
+		CoreGui[UNIQUE_GUI_NAME]:Destroy()
+	end
+end)
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = UNIQUE_GUI_NAME
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Parent = ScreenGui
+TextLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5) -- set trọng tâm
+TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0) -- center màn hình
+TextLabel.BackgroundTransparency = 1
+TextLabel.Text = ""
+TextLabel.TextWrapped = true
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextScaled = false
+TextLabel.TextSize = 30
+TextLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- chữ đỏ
+TextLabel.TextStrokeTransparency = 0
+
+-- Sound
+local Sound = Instance.new("Sound")
+Sound.SoundId = TypingSoundId
+Sound.Volume = 1
+Sound.Parent = ScreenGui
+
+-- ===== HIỆU ỨNG RUNG LUÔN LUÔN (KHÔNG DỪNG) =====
+spawn(function()
+	while true do
+		local x = math.random(-ShakeMagnitude, ShakeMagnitude)
+		local y = math.random(-ShakeMagnitude, ShakeMagnitude)
+		TextLabel.Position = UDim2.new(0.5, x, 0.5, y)
+		task.wait(ShakeSpeed)
+	end
+end)
+
+-- ===== HIỆN CHỮ (TYPEWRITER) =====
+for i = 1, #TextToShow do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(TypingSpeed)
+end
+
+-- ⏳ ĐỢI 3 GIÂY
+task.wait(WaitBeforeDelete)
+
+-- ===== XOÁ CHỮ NGƯỢC (VẪN RUNG) =====
+for i = #TextToShow, 0, -1 do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(DeleteSpeed)
+end
+
+-- CLEANUP TUYỆT ĐỐI
+pcall(function()
+	TextLabel.Text = ""
+	Sound:Stop()
+	Sound:Destroy()
+	TextLabel:Destroy()
+	ScreenGui:Destroy()
+end)
+
+wait(1)
+
+wait(1)
+
+-- ================= CONFIG =================
+local UNIQUE_GUI_NAME = "TypewriterSubtitle_AlwaysShake"
+local TextToShow = "Do YoU tHiNk YoU aRe StIlL a NoRmAl PeRsOn¿"
+local TypingSpeed = 0.05
+local DeleteSpeed = 0.04
+local WaitBeforeDelete = 3
+local TypingSoundId = "rbxassetid://9083627113"
+local ShakeMagnitude = 3 -- cường độ rung
+local ShakeSpeed = 0.03 -- tốc độ cập nhật vị trí
+-- ============================================
+
+local CoreGui = game:GetService("CoreGui")
+
+-- CLEAN GUI CŨ
+pcall(function()
+	if CoreGui:FindFirstChild(UNIQUE_GUI_NAME) then
+		CoreGui[UNIQUE_GUI_NAME]:Destroy()
+	end
+end)
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = UNIQUE_GUI_NAME
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Parent = ScreenGui
+TextLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5) -- set trọng tâm
+TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0) -- center màn hình
+TextLabel.BackgroundTransparency = 1
+TextLabel.Text = ""
+TextLabel.TextWrapped = true
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextScaled = false
+TextLabel.TextSize = 30
+TextLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- chữ đỏ
+TextLabel.TextStrokeTransparency = 0
+
+-- Sound
+local Sound = Instance.new("Sound")
+Sound.SoundId = TypingSoundId
+Sound.Volume = 1
+Sound.Parent = ScreenGui
+
+-- ===== HIỆU ỨNG RUNG LUÔN LUÔN (KHÔNG DỪNG) =====
+spawn(function()
+	while true do
+		local x = math.random(-ShakeMagnitude, ShakeMagnitude)
+		local y = math.random(-ShakeMagnitude, ShakeMagnitude)
+		TextLabel.Position = UDim2.new(0.5, x, 0.5, y)
+		task.wait(ShakeSpeed)
+	end
+end)
+
+-- ===== HIỆN CHỮ (TYPEWRITER) =====
+for i = 1, #TextToShow do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(TypingSpeed)
+end
+
+-- ⏳ ĐỢI 3 GIÂY
+task.wait(WaitBeforeDelete)
+
+-- ===== XOÁ CHỮ NGƯỢC (VẪN RUNG) =====
+for i = #TextToShow, 0, -1 do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(DeleteSpeed)
+end
+
+-- CLEANUP TUYỆT ĐỐI
+pcall(function()
+	TextLabel.Text = ""
+	Sound:Stop()
+	Sound:Destroy()
+	TextLabel:Destroy()
+	ScreenGui:Destroy()
+end)
+
+wait(1)
+
+-- ================= CONFIG =================
+local UNIQUE_GUI_NAME = "TypewriterSubtitle_AlwaysShake"
+local TextToShow = "WaKe Up \nWaKe Up \nWaKe Up \nWaKe Up \nWaKe Up \nWaKe Up \nWaKe Up \nWaKe Up \nWaKe Up"
+local TypingSpeed = 0.05
+local DeleteSpeed = 0.04
+local WaitBeforeDelete = 3
+local TypingSoundId = "rbxassetid://9083627113"
+local ShakeMagnitude = 3 -- cường độ rung
+local ShakeSpeed = 0.03 -- tốc độ cập nhật vị trí
+-- ============================================
+
+local CoreGui = game:GetService("CoreGui")
+
+-- CLEAN GUI CŨ
+pcall(function()
+	if CoreGui:FindFirstChild(UNIQUE_GUI_NAME) then
+		CoreGui[UNIQUE_GUI_NAME]:Destroy()
+	end
+end)
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = UNIQUE_GUI_NAME
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local TextLabel = Instance.new("TextLabel")
+TextLabel.Parent = ScreenGui
+TextLabel.Size = UDim2.new(0.8, 0, 0.2, 0)
+TextLabel.AnchorPoint = Vector2.new(0.5, 0.5) -- set trọng tâm
+TextLabel.Position = UDim2.new(0.5, 0, 0.5, 0) -- center màn hình
+TextLabel.BackgroundTransparency = 1
+TextLabel.Text = ""
+TextLabel.TextWrapped = true
+TextLabel.Font = Enum.Font.GothamBold
+TextLabel.TextScaled = false
+TextLabel.TextSize = 30
+TextLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- chữ đỏ
+TextLabel.TextStrokeTransparency = 0
+
+-- Sound
+local Sound = Instance.new("Sound")
+Sound.SoundId = TypingSoundId
+Sound.Volume = 1
+Sound.Parent = ScreenGui
+
+-- ===== HIỆU ỨNG RUNG LUÔN LUÔN (KHÔNG DỪNG) =====
+spawn(function()
+	while true do
+		local x = math.random(-ShakeMagnitude, ShakeMagnitude)
+		local y = math.random(-ShakeMagnitude, ShakeMagnitude)
+		TextLabel.Position = UDim2.new(0.5, x, 0.5, y)
+		task.wait(ShakeSpeed)
+	end
+end)
+
+-- ===== HIỆN CHỮ (TYPEWRITER) =====
+for i = 1, #TextToShow do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(TypingSpeed)
+end
+
+-- ⏳ ĐỢI 3 GIÂY
+task.wait(WaitBeforeDelete)
+
+-- ===== XOÁ CHỮ NGƯỢC (VẪN RUNG) =====
+for i = #TextToShow, 0, -1 do
+	TextLabel.Text = TextToShow:sub(1, i)
+	Sound:Stop()
+	Sound.TimePosition = 0
+	Sound:Play()
+	task.wait(DeleteSpeed)
+end
+
+-- CLEANUP TUYỆT ĐỐI
+pcall(function()
+	TextLabel.Text = ""
+	Sound:Stop()
+	Sound:Destroy()
+	TextLabel:Destroy()
+	ScreenGui:Destroy()
+end)
+
+wait(0.1)
+game.Lighting.MainColorCorrection.TintColor = Color3.fromRGB(255, 255, 255)
+game.Players.LocalPlayer.Character.Humanoid.Health -= 100
+firesignal(
+						game.ReplicatedStorage.RemotesFolder.DeathHint.OnClientEvent,
+						{
+							"-. --- - .... .. -. --. / .-- . -. - / .-- .-. --- -. --. --..-- / -. --- - .... .. -. --. / --. --- -. . / .-- .-. --- -. --. .-.-.-",
+							"-. --- - .... .. -. --. / ..-. --- .-.. .-.. --- .-- ... / -.-- --- ..- --..-- / -. --- - .... .. -. --. / .-- .- - -.-. .... ... / -.-- --- ..-",
+							".--- ..- ... - / -.-- --- ..- .-. / .. -- .- --. .. -. .- - .. --- -. .-.-.-"
+						},
+						"Blue"
+					)
+
+					game:GetService("ReplicatedStorage").GameStats[
+						"Player_"..plr.Name
+					].Total.DeathCause.Value = "Hallucination"
