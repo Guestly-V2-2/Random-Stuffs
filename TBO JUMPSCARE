@@ -1,0 +1,194 @@
+game.Lighting.MainColorCorrection.TintColor = Color3.fromRGB(0, 0, 0)
+wait(5)
+
+--[[ 
+    ZOOM-IN PREVIEW → HARD JUMPSCARE
+    STRONG SHAKE DURING FADE OUT
+    CLEAN STATE
+--]]
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local camera = workspace.CurrentCamera
+
+-- ================= CONFIG =================
+local JUMPSCARE_IMAGE = "rbxassetid://131478715675612"
+local PREVIEW_SOUND_ID = "rbxassetid://70421896110555"
+local SCREAM_SOUND_ID  = "rbxassetid://130990524400761"
+
+local PREVIEW_TIME = 7
+local PREVIEW_SHAKE = 0.006
+
+local JUMP_IMAGE_SHAKE = 0.05   -- RUNG ẢNH MẠNH
+local SHAKE_TIME = 6            -- 3s giữ + 3s fade
+
+local CAM_SHAKE_INTENSITY = 1.6
+local FOV_JUMP = 35
+-- =========================================
+
+-- ================= SAVE STATE =================
+local oldFOV = camera.FieldOfView
+
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local oldWS = humanoid.WalkSpeed
+local oldJP = humanoid.JumpPower
+
+-- LOCK PLAYER
+humanoid.WalkSpeed = 0
+humanoid.JumpPower = 0
+
+-- ================= GUI =================
+local gui = Instance.new("ScreenGui")
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = player.PlayerGui
+
+local image = Instance.new("ImageLabel")
+image.AnchorPoint = Vector2.new(0.5,0.5)
+image.Position = UDim2.new(0.5,0,0.5,0)
+image.Size = UDim2.new(0.15,0,0.15,0)
+image.BackgroundTransparency = 1
+image.Image = JUMPSCARE_IMAGE
+image.Parent = gui
+
+Instance.new("UIAspectRatioConstraint", image)
+
+-- ================= PREVIEW SOUND =================
+local previewSound = Instance.new("Sound")
+previewSound.SoundId = PREVIEW_SOUND_ID
+previewSound.Volume = 0
+previewSound.Looped = true
+previewSound.Parent = workspace
+previewSound:Play()
+
+TweenService:Create(
+    previewSound,
+    TweenInfo.new(PREVIEW_TIME),
+    {Volume = 3}
+):Play()
+
+-- ================= PREVIEW ZOOM =================
+TweenService:Create(
+    image,
+    TweenInfo.new(PREVIEW_TIME),
+    {Size = UDim2.new(0.45,0,0.45,0)}
+):Play()
+
+-- PREVIEW SHAKE
+local previewing = true
+local basePos = image.Position
+
+task.spawn(function()
+    local start = tick()
+    while previewing and tick() - start < PREVIEW_TIME do
+        image.Position = basePos + UDim2.new(
+            (math.random()-0.5)*PREVIEW_SHAKE,0,
+            (math.random()-0.5)*PREVIEW_SHAKE,0
+        )
+        RunService.RenderStepped:Wait()
+    end
+    image.Position = basePos
+end)
+
+task.wait(PREVIEW_TIME)
+previewing = false
+previewSound:Destroy()
+
+-- ================= SCREAM =================
+local scream = Instance.new("Sound")
+scream.SoundId = SCREAM_SOUND_ID
+scream.Volume = 10
+scream.Parent = workspace
+scream:Play()
+
+game.Players.LocalPlayer.Character.Humanoid:TakeDamage(100)
+        firesignal(
+						game.ReplicatedStorage.RemotesFolder.DeathHint.OnClientEvent,
+						{
+							"- .... . / - .... .. -. --. / - .... .- - / .. -. / . ...- . .-. -.-- / .--. . --- .--. .-.. . / -. .. --. .... - -- .- .-. . .-.-.-",
+							"-... ..- - / -.. --- / -.-- --- ..- / - .... .. -. -.- / - .... .- - / - .... .. -. --. / . -..- .. ... - ... ..--..",
+							"- .... .. -. -.- / -.-. .- .-. . ..-. ..- .-.. .-.. -.-- .-.-.-"
+						},
+						"Blue"
+					)
+
+game.ReplicatedStorage.GameStats["Player_" .. game.Players.LocalPlayer.Name].Total.DeathCause.Value = "The Boiled One"
+
+-- ================= HARD JUMPSCARE =================
+TweenService:Create(
+    image,
+    TweenInfo.new(0.08, Enum.EasingStyle.Back),
+    {Size = UDim2.new(1.2,0,1.2,0)}
+):Play()
+
+TweenService:Create(
+    camera,
+    TweenInfo.new(0.15),
+    {FieldOfView = FOV_JUMP}
+):Play()
+
+-- CAMERA SHAKE
+local camCF = camera.CFrame
+local camShaking = true
+
+task.spawn(function()
+    local start = tick()
+    while camShaking and tick() - start < SHAKE_TIME do
+        camera.CFrame = camCF * CFrame.new(
+            math.random(-100,100)/100 * CAM_SHAKE_INTENSITY,
+            math.random(-100,100)/100 * CAM_SHAKE_INTENSITY,
+            0
+        )
+        RunService.RenderStepped:Wait()
+    end
+    camera.CFrame = camCF
+end)
+
+-- IMAGE STRONG SHAKE (DURING JUMPSCARE + FADE)
+local imgShaking = true
+local imgBasePos = image.Position
+
+task.spawn(function()
+    local start = tick()
+    while imgShaking and tick() - start < SHAKE_TIME do
+        image.Position = imgBasePos + UDim2.new(
+            (math.random()-0.5)*JUMP_IMAGE_SHAKE,0,
+            (math.random()-0.5)*JUMP_IMAGE_SHAKE,0
+        )
+        RunService.RenderStepped:Wait()
+    end
+    image.Position = imgBasePos
+end)
+
+-- ================= FADE OUT =================
+task.delay(3,function()
+    local fade = TweenService:Create(
+        image,
+        TweenInfo.new(3),
+        {ImageTransparency = 1}
+    )
+    fade:Play()
+    fade.Completed:Wait()
+
+    -- CLEAN ALL STATE AFTER FADE
+    camShaking = false
+    imgShaking = false
+
+    humanoid.WalkSpeed = oldWS
+    humanoid.JumpPower = oldJP
+
+    TweenService:Create(
+        camera,
+        TweenInfo.new(0.4),
+        {FieldOfView = oldFOV}
+    ):Play()
+
+    task.delay(0.5,function()
+        gui:Destroy()
+        scream:Destroy()
+    end)
+end)
