@@ -1,0 +1,202 @@
+--==============================
+-- CONFIG (CHỈNH Ở ĐÂY)
+--==============================
+local ENTITY_ASSET_ID = 104745536969029 -- <<< DÁN ID MODEL CỦA BẠN
+local LOOK_TRIGGER = 3            -- nhìn >= 3s
+local SAFE_LOOK = 2               -- nhìn <= 2s thì safe
+local NEAR_DISTANCE = 10          -- đứng gần
+local DANGER_DURATION = 10        -- thời gian đỏ + rung
+
+
+--==============================
+-- SERVICES
+--==============================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local TweenService = game:GetService("TweenService")
+local InsertService = game:GetService("InsertService")
+
+local player = Players.LocalPlayer
+local cam = workspace.CurrentCamera
+
+--==============================
+-- HOOK SCRIPT PHỤ (SAU 10 GIÂY)
+--==============================
+local function OnDangerFinished(entity)
+    -- GẮN SCRIPT PHỤ Ở ĐÂY
+    print("HOOK: Entity sequence finished")
+end
+
+--==============================
+-- LOAD MODEL TỪ ASSET ID
+--==============================
+local function loadEntity(assetId)
+    local ok, model = pcall(function()
+        local asset = InsertService:LoadAsset(assetId)
+        return asset:GetChildren()[1]
+    end)
+
+    if not ok or not model or not model:IsA("Model") then
+        warn("Không load được model từ Asset ID")
+        return nil
+    end
+
+    if not model.PrimaryPart then
+        local part = model:FindFirstChildWhichIsA("BasePart", true)
+        if not part then
+            warn("Model không có BasePart")
+            return nil
+        end
+        model.PrimaryPart = part
+    end
+
+    model.Parent = workspace
+    model.Name = "ExecutorEntity"
+    return model
+end
+
+--==============================
+-- LẤY PHÒNG HIỆN TẠI
+--==============================
+local roomNumber = player:GetAttribute("CurrentRoom")
+local room = workspace.CurrentRooms:FindFirstChild(tostring(roomNumber))
+if not room then
+    warn("Không tìm thấy phòng hiện tại")
+    return
+end
+
+--==============================
+-- RANDOM VỊ TRÍ TRONG PHÒNG
+--==============================
+local candidates = {}
+for _, v in ipairs(room:GetDescendants()) do
+    if v:IsA("BasePart") and v.Size.X > 8 and v.Size.Z > 8 then
+        table.insert(candidates, v)
+    end
+end
+if #candidates == 0 then
+    warn("Không tìm được mặt sàn phù hợp")
+    return
+end
+
+local base = candidates[math.random(#candidates)]
+local offset = Vector3.new(
+    math.random(-base.Size.X/2, base.Size.X/2),
+    0,
+    math.random(-base.Size.Z/2, base.Size.Z/2)
+)
+
+--==============================
+-- SPAWN ENTITY
+--==============================
+local entity = loadEntity(ENTITY_ASSET_ID)
+if not entity then return end
+
+entity.Name = "TheBoiledOne"
+workspace.TheBoiledOne.Head:GetChildren()[3].ParticleEmitter.Texture = "rbxassetid://131478715675612"
+workspace.TheBoiledOne.Head.Troll:Destroy()
+
+entity:SetPrimaryPartCFrame(
+    base.CFrame * CFrame.new(offset + Vector3.new(0, 5, 0))
+)
+
+--==============================
+-- EFFECT: ĐỎ MÔI TRƯỜNG
+--==============================
+local colorEffect = Instance.new("ColorCorrectionEffect")
+colorEffect.TintColor = Color3.new(1,1,1)
+colorEffect.Parent = Lighting
+
+--==============================
+-- STATE
+--==============================
+local timer = 0
+local dangerStarted = false
+local cameraLocked = false
+local shakePower = 0
+local conn
+
+--==============================
+-- CAMERA SHAKE
+--==============================
+local function shakeCamera()
+    local offset = Vector3.new(
+        math.random(-100,100)/350 * shakePower,
+        math.random(-100,100)/350 * shakePower,
+        0
+    )
+    cam.CFrame = cam.CFrame * CFrame.new(offset)
+end
+
+--==============================
+-- START DANGER SEQUENCE
+--==============================
+local function startDanger()
+    if dangerStarted then return end
+    dangerStarted = true
+
+    TweenService:Create(
+        colorEffect,
+        TweenInfo.new(DANGER_DURATION),
+        {TintColor = Color3.fromRGB(150,0,0)}
+    ):Play()
+
+    local startTime = tick()
+
+    RunService:BindToRenderStep("EntityShake", 999, function()
+        shakePower = math.clamp((tick() - startTime) / DANGER_DURATION, 0, 1) * 4
+        shakeCamera()
+    end)
+
+    task.delay(DANGER_DURATION, function()
+        RunService:UnbindFromRenderStep("EntityShake")
+        colorEffect:Destroy()
+        if entity then entity:Destroy() end
+        cam.CameraType = Enum.CameraType.Custom
+        OnDangerFinished(entity)
+    end)
+end
+
+--==============================
+-- MAIN LOOP
+--==============================
+conn = RunService.RenderStepped:Connect(function(dt)
+    if not entity or not entity.PrimaryPart then return end
+
+    local camPos = cam.CFrame.Position
+    local dir = (entity.PrimaryPart.Position - camPos).Unit
+    local dot = cam.CFrame.LookVector:Dot(dir)
+    local distance = (entity.PrimaryPart.Position - camPos).Magnitude
+
+    local isLooking = dot > 0.97
+    local isNear = distance <= NEAR_DISTANCE
+
+    if isLooking or isNear then
+        timer += dt
+    else
+        timer = 0
+        if not cameraLocked then
+            cam.CameraType = Enum.CameraType.Custom
+        end
+    end
+
+    -- SAFE
+    if timer <= SAFE_LOOK then
+        return
+    end
+
+    -- TRIGGER KILL (NHÌN HOẶC ĐỨNG GẦN >= 3s)
+    if timer >= LOOK_TRIGGER then
+        cameraLocked = true
+        cam.CameraType = Enum.CameraType.Scriptable
+        cam.CFrame = CFrame.new(camPos, entity.PrimaryPart.Position)
+
+        if player.Character then
+            player.Character:BreakJoints() -- chết client-side
+        end
+
+        startDanger()
+        conn:Disconnect()
+    end
+end)
