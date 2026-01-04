@@ -1,0 +1,116 @@
+--// JUMPSCARE SCRIPT (IMAGE + GITHUB SOUND + DARK ENV | 1 SECOND)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Lighting = game:GetService("Lighting")
+local SoundService = game:GetService("SoundService")
+
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+
+-- ===== CONFIG =====
+local IMAGE_ID = "rbxassetid://140575828191525"
+local GITHUB_RAW_SOUND = "https://github.com/Guestly-V2-2/Music-Sound/raw/refs/heads/main/lv_0_20260104130055.mp3"
+-- ==================
+
+-- ===== SAVE ORIGINAL LIGHTING =====
+local originalLighting = {
+	Brightness = Lighting.Brightness,
+	Ambient = Lighting.Ambient,
+	OutdoorAmbient = Lighting.OutdoorAmbient,
+	FogEnd = Lighting.FogEnd,
+	FogStart = Lighting.FogStart,
+	FogColor = Lighting.FogColor,
+}
+
+-- ColorCorrection
+local originalCC
+if Lighting:FindFirstChild("JumpScareCC") then
+	Lighting.JumpScareCC:Destroy()
+end
+
+for _, v in ipairs(Lighting:GetChildren()) do
+	if v:IsA("ColorCorrectionEffect") then
+		originalCC = v:Clone()
+	end
+end
+
+-- ===== APPLY DARK ENVIRONMENT =====
+Lighting.Brightness = 0
+Lighting.Ambient = Color3.new(0, 0, 0)
+Lighting.OutdoorAmbient = Color3.new(0, 0, 0)
+Lighting.FogStart = 0
+Lighting.FogEnd = 50
+Lighting.FogColor = Color3.new(0, 0, 0)
+
+local cc = Instance.new("ColorCorrectionEffect")
+cc.Name = "JumpScareCC"
+cc.Contrast = 1
+cc.Saturation = -1
+cc.Brightness = -0.2
+cc.Parent = Lighting
+
+-- ===== GUI =====
+local gui = Instance.new("ScreenGui")
+gui.IgnoreGuiInset = true
+gui.ResetOnSpawn = false
+gui.Parent = PlayerGui
+
+local img = Instance.new("ImageLabel")
+img.AnchorPoint = Vector2.new(0.5, 0.5)
+img.Position = UDim2.fromScale(0.5, 0.5)
+img.Size = UDim2.fromScale(0.3, 0.3)
+img.BackgroundTransparency = 1
+img.Image = IMAGE_ID
+img.ScaleType = Enum.ScaleType.Fit
+img.Parent = gui
+
+-- ===== SOUND =====
+local sound = Instance.new("Sound")
+sound.Volume = 1
+sound.Looped = false
+
+pcall(function()
+	if getsynassetfromurl then
+		sound.SoundId = getsynassetfromurl(GITHUB_RAW_SOUND)
+	elseif writefile then
+		local data = game:HttpGet(GITHUB_RAW_SOUND)
+		writefile("jumpscare.mp3", data)
+		sound.SoundId = getsynasset("jumpscare.mp3")
+	end
+end)
+
+sound.Parent = SoundService
+sound:Play()
+
+-- ===== SHAKE + TIMER =====
+local startTime = tick()
+local shakeStrength = 6
+local conn
+
+conn = RunService.RenderStepped:Connect(function()
+	if tick() - startTime >= 1 then
+		-- CLEANUP
+		conn:Disconnect()
+		sound:Stop()
+		sound:Destroy()
+		gui:Destroy()
+
+		-- RESTORE LIGHTING
+		Lighting.Brightness = originalLighting.Brightness
+		Lighting.Ambient = originalLighting.Ambient
+		Lighting.OutdoorAmbient = originalLighting.OutdoorAmbient
+		Lighting.FogStart = originalLighting.FogStart
+		Lighting.FogEnd = originalLighting.FogEnd
+		Lighting.FogColor = originalLighting.FogColor
+
+		if cc then cc:Destroy() end
+		if originalCC then originalCC.Parent = Lighting end
+
+		return
+	end
+
+	local x = math.random(-shakeStrength, shakeStrength)
+	local y = math.random(-shakeStrength, shakeStrength)
+	img.Position = UDim2.fromScale(0.5, 0.5) + UDim2.fromOffset(x, y)
+end)
