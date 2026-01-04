@@ -161,7 +161,7 @@ local UNIQUE_GUI_NAME = "TypewriterSubtitle_CLEAN"
 
 local TextToShow = "MAYBE."
 local TypingSpeed = 0.5
-local DeleteSpeed = 0.5
+local DeleteSpeed = 1
 local WaitBeforeDelete = 3
 
 local TypingSoundId = "rbxassetid://6042053626"
