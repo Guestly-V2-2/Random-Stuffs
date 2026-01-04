@@ -1,0 +1,304 @@
+local spawn = Instance.new("Sound")
+spawn.Name = "Spawn"
+spawn.Parent = game.Workspace
+spawn.Volume = 1
+spawn.SoundId = "rbxassetid://111176063830942"
+spawn:Play()
+
+wait(3)
+
+--// DOORS BACKWARD ENTITY EXECUTOR (MODEL + RED ENV + SHAKE)
+
+-- ================= CONFIG =================
+local MODEL_ASSET_ID = 111176063830942 -- <<<<< ID MODEL CỦA BẠN
+-- =========================================
+
+-- SERVICES
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local InsertService = game:GetService("InsertService")
+local Lighting = game:GetService("Lighting")
+
+-- PLAYER
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local root = character:WaitForChild("HumanoidRootPart")
+local camera = Workspace.CurrentCamera
+
+-- ROOMS
+local rooms = Workspace:WaitForChild("CurrentRooms")
+local latestRoomValue = Workspace:WaitForChild("LatestRoom")
+
+-- STATE
+local entityModel = nil
+local moving = true
+local detectedMovement = false
+local cleanupDone = false
+local movementConnection = nil
+local chaseActive = false
+
+-- EFFECT STATE
+local colorEffect = nil
+local shakeConnection = nil
+
+-- CONFIG
+local BACKWARD_SPEED = 50
+local CHASE_SPEED = 30
+local WAIT_BEFORE_MOVE = 3
+local WAIT_BEFORE_CHASE = 5
+local MAX_SHAKE = 0.6
+local MAX_RED = 0.8
+local MAX_DISTANCE = 60
+
+-- =========================
+-- HOOK
+-- =========================
+local function OnEntityCatchPlayer(entity)
+    game.Workspace.Ambience:Destroy()
+
+game.Lighting.MainColorCorrection.TintColor = Color3.fromRGB(0, 0, 0)
+		task.wait(3)
+
+		-- ================= JUMPSCARE =================
+		local PlayerGui = plr:WaitForChild("PlayerGui")
+
+		local gui = Instance.new("ScreenGui")
+		gui.Name = "JumpScareGui"
+		gui.IgnoreGuiInset = true
+		gui.ResetOnSpawn = false
+		gui.Parent = PlayerGui
+
+		local img = Instance.new("ImageLabel")
+		img.Parent = gui
+		img.AnchorPoint = Vector2.new(0.5, 0.5)
+		img.Position = UDim2.fromScale(0.5, 0.5)
+		img.Size = UDim2.fromScale(1, 1)
+		img.BackgroundTransparency = 1
+		img.Image = "rbxassetid://104647389465726" -- bạn tự đổi
+		img.ScaleType = Enum.ScaleType.Fit
+		img.SizeConstraint = Enum.SizeConstraint.RelativeYY
+
+		local sound = Instance.new("Sound")
+		sound.Parent = gui
+		sound.SoundId = "rbxassetid://313948389" -- bạn tự đổi
+		sound.Volume = 1
+		sound:Play()
+
+		local SHAKE_POWER_UI = 6
+		local startTime = tick()
+
+		local uiConn
+		uiConn = RunService.RenderStepped:Connect(function()
+			if tick() - startTime >= 7 then
+				uiConn:Disconnect()
+				gui:Destroy()
+				sound:Destroy()
+				game.Lighting.MainColorCorrection.TintColor = Color3.fromRGB(255,255,255)
+
+				hum:TakeDamage(100)
+
+				if hum.Health <= 0 then
+					firesignal(
+						game.ReplicatedStorage.RemotesFolder.DeathHint.OnClientEvent,
+						{
+							"- .... . / ..-. . .- .-. -. . ... ... / -.. .. -.. / -. --- - / . -. -.. / -.-- . -",
+							". ...- . .-. -.-- - .... .. -. --. / .- .-. --- ..- -. -.. / -.-- --- ..- / .. ... / -. --- .-. -- .- .-..",
+							"-.-- --- ..- / .-- --- -. .----. - / . ... -.-. .- .--. . / - .... . / -.. .- .-. -.- -. . ... ... .-.-.-"
+						},
+						"Blue"
+					)
+
+					game:GetService("ReplicatedStorage").GameStats[
+						"Player_"..plr.Name
+					].Total.DeathCause.Value = "UNKNOWN"
+				end
+				return
+			end
+end
+
+-- =========================
+-- CLEANUP
+-- =========================
+local function Cleanup()
+    if cleanupDone then return end
+    cleanupDone = true
+
+    if movementConnection then
+        movementConnection:Disconnect()
+        movementConnection = nil
+    end
+
+    if shakeConnection then
+        shakeConnection:Disconnect()
+        shakeConnection = nil
+    end
+
+    if colorEffect then
+        colorEffect:Destroy()
+        colorEffect = nil
+    end
+
+    if entityModel then
+        entityModel:Destroy()
+        entityModel = nil
+    end
+
+    humanoid.WalkSpeed = 16
+    humanoid.JumpPower = 50
+
+    moving = false
+    detectedMovement = false
+    chaseActive = false
+end
+
+-- =========================
+-- PLAYER MOVEMENT CHECK
+-- =========================
+local lastPos = root.Position
+
+movementConnection = RunService.RenderStepped:Connect(function()
+    if not moving then return end
+    local currentPos = root.Position
+    if (currentPos - lastPos).Magnitude > 0.05 then
+        detectedMovement = true
+    end
+    lastPos = currentPos
+end)
+
+-- =========================
+-- VISUAL EFFECTS
+-- =========================
+local function StartChaseEffects()
+    colorEffect = Instance.new("ColorCorrectionEffect")
+    colorEffect.TintColor = Color3.fromRGB(255, 255, 255)
+    colorEffect.Parent = Lighting
+
+    shakeConnection = RunService.RenderStepped:Connect(function()
+        if not chaseActive or not entityModel then return end
+
+        local dist = (entityModel.PrimaryPart.Position - root.Position).Magnitude
+        local alpha = math.clamp(1 - (dist / MAX_DISTANCE), 0, 1)
+
+        -- RED ENV
+        colorEffect.TintColor = Color3.new(
+            1,
+            1 - (alpha * MAX_RED),
+            1 - (alpha * MAX_RED)
+        )
+
+        -- CAMERA SHAKE
+        local shake = alpha * MAX_SHAKE
+        local offset = Vector3.new(
+            (math.random() - 0.5) * shake,
+            (math.random() - 0.5) * shake,
+            0
+        )
+
+        camera.CFrame = camera.CFrame * CFrame.new(offset)
+    end)
+end
+
+-- =========================
+-- SPAWN ENTITY MODEL
+-- =========================
+local function SpawnEntity()
+    local assets = InsertService:LoadAsset(MODEL_ASSET_ID)
+    if not assets then return end
+
+    local model
+    for _, v in ipairs(assets:GetChildren()) do
+        if v:IsA("Model") then
+            model = v
+            break
+        end
+    end
+    if not model then
+        assets:Destroy()
+        return
+    end
+
+    for _, p in ipairs(model:GetDescendants()) do
+        if p:IsA("BasePart") then
+            p.Anchored = true
+            p.CanCollide = false
+        end
+    end
+
+    if not model.PrimaryPart then
+        model.PrimaryPart = model:FindFirstChildWhichIsA("BasePart", true)
+    end
+
+    local spawnRoom = rooms:FindFirstChild(tostring(latestRoomValue.Value + 1))
+    if not spawnRoom then
+        assets:Destroy()
+        return
+    end
+
+    model:SetPrimaryPartCFrame(spawnRoom.RoomEntrance.CFrame)
+    model.Parent = Workspace
+    entityModel = model
+end
+
+-- =========================
+-- MOVE BACKWARD
+-- =========================
+local function MoveBackward()
+    for i = latestRoomValue.Value, 0, -1 do
+        if not entityModel or cleanupDone then return end
+
+        local room = rooms:FindFirstChild(tostring(i))
+        if room and room:FindFirstChild("RoomEntrance") then
+            local targetCF = room.RoomEntrance.CFrame
+
+            local dist = (entityModel.PrimaryPart.Position - targetCF.Position).Magnitude
+            local time = dist / BACKWARD_SPEED
+
+            TweenService:Create(
+                entityModel.PrimaryPart,
+                TweenInfo.new(time, Enum.EasingStyle.Linear),
+                {CFrame = targetCF}
+            ):Play()
+
+            task.wait(time)
+
+            if i == latestRoomValue.Value and detectedMovement then
+                moving = false
+                task.wait(WAIT_BEFORE_CHASE)
+
+                humanoid.WalkSpeed = 0
+                humanoid.JumpPower = 0
+                chaseActive = true
+                StartChaseEffects()
+
+                local dist2 = (entityModel.PrimaryPart.Position - root.Position).Magnitude
+                local time2 = dist2 / CHASE_SPEED
+
+                TweenService:Create(
+                    entityModel.PrimaryPart,
+                    TweenInfo.new(time2, Enum.EasingStyle.Linear),
+                    {CFrame = root.CFrame}
+                ):Play()
+
+                task.wait(time2)
+
+                OnEntityCatchPlayer(entityModel)
+                Cleanup()
+                return
+            end
+        end
+    end
+
+    Cleanup()
+end
+
+-- =========================
+-- START
+-- =========================
+task.spawn(function()
+    SpawnEntity()
+    task.wait(WAIT_BEFORE_MOVE)
+    MoveBackward()
+end)
