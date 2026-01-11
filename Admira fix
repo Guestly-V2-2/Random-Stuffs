@@ -1,0 +1,41 @@
+local player = game.Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "Admiration"
+screenGui.Parent = playerGui
+screenGui.IgnoreGuiInset = true
+
+local red = Instance.new("ImageLabel")
+red.Name = "AdmirationMove"
+red.Size = UDim2.new(1, 0, 1, 0)
+red.BackgroundTransparency = 1 -- Make the background fully transparent
+red.Image = "rbxassetid://116436211275451" -- Set the image using a random Image ID
+red.ImageTransparency = 0
+red.Parent = screenGui
+wait1.5)
+
+coroutine.wrap(function()
+local vu5 = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
+local vuno = true
+if vuno == true and vu5.MoveDirection.Magnitude > 0 then
+game.Players.LocalPlayer.Character.Humanoid.Health = 0
+
+firesignal(
+    game.ReplicatedStorage.RemotesFolder.DeathHint.OnClientEvent,
+    {
+        "You died to who called Admiration",
+        "If it needs you to move then it wants to kill you",
+        "Don't let it fools you."
+    },
+    "Blue"
+)
+
+game.ReplicatedStorage.GameStats["Player_" .. player.Name]
+    .Total.DeathCause.Value = "Admiration"
+end
+end)()
+
+wait(2)
+game.Players.LocalPlayer.PlayerGui.Admiration:Destroy()
+vuno = false
