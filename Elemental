@@ -21,3 +21,33 @@ end
 local P = game:GetService("Players").LocalPlayer.Character
 
 Accs("RockAccessory", P, "rbxassetid://4307568890", "rbxassetid://4307568951", Vector3.new(1, 1, 1), CFrame.new(-0.5, -1.5, 0), "Right Arm", CFrame.Angles(0, 0, 0))
+
+local find2 = game.Players.LocalPlayer.Character.RockAccessory.Handle
+local attach = Instance.new("Attachment", find2)
+attach.Name = "VFX"
+wait(1)
+local find = game.Players.LocalPlayer.Character.RockAccessory.Handle.VFX
+local Trail = Instance.new("Trail", find)
+Trail.Texture = "rbxassetid://4519882005"
+Trail.Lifetime = 0.2
+Trail.LightEmission = 1
+Trail.LightInfluence = 1
+Trail.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(252, 227, 3)),   -- Đỏ
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(253, 227, 3)), -- Xanh lá
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(251, 227, 3))    -- Xanh dương
+})
+
+local a0 = Instance.new("Attachment")
+a0.Name = "Attachment0"
+a0.Position = Vector3.new(0, 1, 0)
+a0.Parent = find2
+
+local a1 = Instance.new("Attachment")
+a1.Name = "Attachment1"
+a1.Position = Vector3.new(0, -1, 0)
+a1.Parent = find2
+wait(1)
+
+Trail.Attachment0 = game.Players.LocalPlayer.Character.RockAccessory.Handle.Attachment0
+Trail.Attachment1 = game.Players.LocalPlayer.Character.RockAccessory.Handle.Attachment1
