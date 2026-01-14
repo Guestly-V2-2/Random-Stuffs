@@ -1,0 +1,54 @@
+-- ts file was generated at discord.gg/25ms
+
+local vu1 = Instance.new('ScreenGui')
+local vu2 = Instance.new('Frame')
+local v3 = Instance.new('ImageLabel')
+
+vu1.Name = 'JumpscareGui'
+vu1.IgnoreGuiInset = true
+vu1.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+vu1.Parent = game.Players.LocalPlayer:WaitForChild('PlayerGui')
+vu2.Name = 'Background'
+vu2.BackgroundColor3 = Color3.fromRGB(3, 25, 99)
+vu2.BorderSizePixel = 0
+vu2.Size = UDim2.new(1, 0, 1, 0)
+vu2.ZIndex = 999
+v3.Name = 'Face'
+v3.AnchorPoint = Vector2.new(0.5, 0.5)
+v3.BackgroundTransparency = 1
+v3.Position = UDim2.new(0.5, 0, 0.5, 0)
+v3.ResampleMode = Enum.ResamplerMode.Pixelated
+v3.Size = UDim2.new(0, 150, 0, 150)
+v3.Image = 'rbxassetid://11862656458'
+vu2.Parent = vu1
+v3.Parent = vu2
+
+local v4 = Instance.new('Sound')
+
+v4.Parent = workspace
+v4.Name = 'MyEarsBurn'
+v4.SoundId = 'rbxassetid://74885373257467'
+v4.PlaybackSpeed = 1
+v4.Volume = 5
+
+task.spawn(function()
+    while vu1.Parent do
+        vu2.BackgroundColor3 = Color3.fromRGB(3, 25, 99)
+
+        task.wait(math.random(25, 100) / 1000)
+
+        vu2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+
+        task.wait(math.random(25, 100) / 1000)
+    end
+end)
+game.TweenService:Create(v3, TweenInfo.new(0.6), {
+    Size = UDim2.new(0, 1850, 0, 1050),
+    ImageTransparency = 0,
+}):Play()
+v4:Play()
+task.wait(0.7)
+
+local v8 = vu1
+
+vu1.Destroy(v8)
