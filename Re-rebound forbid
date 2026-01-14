@@ -1,0 +1,515 @@
+-- ts file was generated at discord.gg/25ms
+
+local v1 = loadstring(game:HttpGet('https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Doors/Entity%20Spawner/V2/Source.lua'))().Create
+local v2 = {
+    Entity = {
+        Name = 'Re-Rebound',
+        Asset = 'rbxassetid://82116817846987',
+        HeightOffset = 0,
+    },
+}
+local v3 = {
+    Flicker = {
+        Enabled = false,
+        Duration = 7,
+    },
+    Shatter = false,
+    Repair = false,
+}
+
+v2.Lights = v3
+v2.Earthquake = {Enabled = false}
+v2.CameraShake = {
+    Enabled = true,
+    Range = 150,
+    Values = {
+        4,
+        4,
+        3,
+        3,
+    },
+}
+v2.Movement = {
+    Speed = 90,
+    Delay = 5,
+    Reversed = true,
+}
+v2.Rebounding = {
+    Enabled = false,
+    Type = 'Ambush',
+    Min = 2,
+    Max = 4,
+    Delay = 7,
+}
+v2.Damage = {
+    Enabled = true,
+    Range = 40,
+    Amount = 125,
+}
+v2.Crucifixion = {
+    Enabled = true,
+    Range = 40,
+    Resist = false,
+    Break = true,
+}
+v2.Death = {
+    Type = 'Guiding',
+    Hints = {
+        'You dead to who called Rebound',
+        'He is a looper',
+        'He will loop 4 times every next 4 doors',
+        'Watch out every his moves',
+    },
+    Cause = '',
+}
+
+local v4 = v1(v2)
+
+v4:SetCallback('OnSpawned', function()
+    print('Entity has spawned')
+    local v6 = Instance.new('Sound')
+
+    v6.Parent = game.Workspace
+    v6.Name = 'Scream'
+    v6.SoundId = 'rbxassetid://9114397505'
+    v6.Volume = 5
+    v6.PlaybackSpeed = 0.9
+
+    local v7 = Instance.new('DistortionSoundEffect')
+
+    v7.Parent = v6
+    v7.Level = 1
+
+    local v8 = Instance.new('DistortionSoundEffect')
+
+    v8.Parent = v6
+    v8.Level = 1
+
+    local v9 = Instance.new('PitchShiftSoundEffect')
+
+    v9.Parent = v6
+    v9.Octave = 0.5
+
+    local v10 = Instance.new('PitchShiftSoundEffect')
+
+    v10.Parent = v6
+    v10.Octave = 0.5
+
+    local v11 = Instance.new('PitchShiftSoundEffect')
+
+    v11.Parent = v6
+    v11.Octave = 0.5
+    v6.Volume = 0.1
+
+    v6:Play()
+    wait(3)
+
+    local v17 = Instance.new('Sound')
+
+    v17.Parent = game.Workspace
+    v17.Name = 'Spawn'
+    v17.SoundId = 'rbxassetid://9114221327'
+    v17.PlaybackSpeed = 0.9
+    v17.Volume = 5
+
+    v17:Play()
+end)
+v4:SetCallback('OnStartMoving', function()
+    print('Entity has started moving')
+end)
+v4:SetCallback('OnEnterRoom', function(p18, p19)
+    if p19 == true then
+        print('Entity has entered room: ' .. p18.Name .. ' for the first time')
+    else
+        print('Entity has entered room: ' .. p18.Name .. ' again')
+    end
+end)
+v4:SetCallback('OnLookAt', function(p20)
+    if p20 == true then
+        print('Player is looking at entity')
+    else
+        print('Player view is obstructed by something')
+    end
+end)
+v4:SetCallback('OnRebounding', function(p21)
+    if p21 == true then
+        print('Entity has started rebounding')
+    else
+        print('Entity has finished rebounding')
+    end
+end)
+v4:SetCallback('OnDespawning', function()
+    print('Entity is despawning')
+end)
+v4:SetCallback('OnDespawned', function()
+    print('Entity has despawned')
+end)
+v4:SetCallback('OnDamagePlayer', function(p23)
+    if p23 == 0 then
+        print('Entity has killed the player')
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Guestly-V2-2/Random-Stuffs/refs/heads/main/Forboundjump'))()
+    else
+        print('Entity has damaged the player')
+    end
+end)
+v4:Run()
+game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+wait(2)
+
+local v24 = loadstring(game:HttpGet('https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Doors/Entity%20Spawner/V2/Source.lua'))().Create
+local v25 = {
+    Entity = {
+        Name = 'Re-Rebound',
+        Asset = 'rbxassetid://82116817846987',
+        HeightOffset = 0,
+    },
+}
+local v26 = {
+    Flicker = {
+        Enabled = false,
+        Duration = 7,
+    },
+    Shatter = false,
+    Repair = false,
+}
+
+v25.Lights = v26
+v25.Earthquake = {Enabled = false}
+v25.CameraShake = {
+    Enabled = true,
+    Range = 150,
+    Values = {
+        4,
+        4,
+        3,
+        3,
+    },
+}
+v25.Movement = {
+    Speed = 90,
+    Delay = 3,
+    Reversed = true,
+}
+v25.Rebounding = {
+    Enabled = false,
+    Type = 'Ambush',
+    Min = 2,
+    Max = 4,
+    Delay = 7,
+}
+v25.Damage = {
+    Enabled = true,
+    Range = 40,
+    Amount = 125,
+}
+v25.Crucifixion = {
+    Enabled = true,
+    Range = 40,
+    Resist = false,
+    Break = true,
+}
+v25.Death = {
+    Type = 'Guiding',
+    Hints = {
+        'You dead to who called Rebound',
+        'He is a looper',
+        'He will loop 4 times every next 4 doors',
+        'Watch out every his moves',
+    },
+    Cause = '',
+}
+
+local v27 = v24(v25)
+
+v27:SetCallback('OnSpawned', function()
+    print('Entity has spawned')
+
+    local v29 = Instance.new('Sound')
+
+    v29.Parent = game.Workspace
+    v29.Name = 'Spawn'
+    v29.SoundId = 'rbxassetid://9114221327'
+    v29.PlaybackSpeed = 0.9
+    v29.Volume = 5
+
+    v29:Play()
+end)
+v27:SetCallback('OnStartMoving', function()
+    print('Entity has started moving')
+end)
+v27:SetCallback('OnEnterRoom', function(p30, p31)
+    if p31 == true then
+        print('Entity has entered room: ' .. p30.Name .. ' for the first time')
+    else
+        print('Entity has entered room: ' .. p30.Name .. ' again')
+    end
+end)
+v27:SetCallback('OnLookAt', function(p32)
+    if p32 == true then
+        print('Player is looking at entity')
+    else
+        print('Player view is obstructed by something')
+    end
+end)
+v27:SetCallback('OnRebounding', function(p33)
+    if p33 == true then
+        print('Entity has started rebounding')
+    else
+        print('Entity has finished rebounding')
+    end
+end)
+v27:SetCallback('OnDespawning', function()
+    print('Entity is despawning')
+end)
+v27:SetCallback('OnDespawned', function()
+    print('Entity has despawned')
+end)
+v27:SetCallback('OnDamagePlayer', function(p34)
+    if p34 == 0 then
+        print('Entity has killed the player')
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Guestly-V2-2/Random-Stuffs/refs/heads/main/Forboundjump'))()
+    else
+        print('Entity has damaged the player')
+    end
+end)
+v27:Run()
+game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+wait(2)
+
+local v24 = loadstring(game:HttpGet('https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Doors/Entity%20Spawner/V2/Source.lua'))().Create
+local v25 = {
+    Entity = {
+        Name = 'Re-Rebound',
+        Asset = 'rbxassetid://82116817846987',
+        HeightOffset = 0,
+    },
+}
+local v26 = {
+    Flicker = {
+        Enabled = false,
+        Duration = 7,
+    },
+    Shatter = false,
+    Repair = false,
+}
+
+v25.Lights = v26
+v25.Earthquake = {Enabled = false}
+v25.CameraShake = {
+    Enabled = true,
+    Range = 150,
+    Values = {
+        4,
+        4,
+        3,
+        3,
+    },
+}
+v25.Movement = {
+    Speed = 90,
+    Delay = 3,
+    Reversed = true,
+}
+v25.Rebounding = {
+    Enabled = false,
+    Type = 'Ambush',
+    Min = 2,
+    Max = 4,
+    Delay = 7,
+}
+v25.Damage = {
+    Enabled = true,
+    Range = 40,
+    Amount = 125,
+}
+v25.Crucifixion = {
+    Enabled = true,
+    Range = 40,
+    Resist = false,
+    Break = true,
+}
+v25.Death = {
+    Type = 'Guiding',
+    Hints = {
+        'You dead to who called Rebound',
+        'He is a looper',
+        'He will loop 4 times every next 4 doors',
+        'Watch out every his moves',
+    },
+    Cause = '',
+}
+
+local v27 = v24(v25)
+
+v27:SetCallback('OnSpawned', function()
+    print('Entity has spawned')
+
+    local v29 = Instance.new('Sound')
+
+    v29.Parent = game.Workspace
+    v29.Name = 'Spawn'
+    v29.SoundId = 'rbxassetid://9114221327'
+    v29.PlaybackSpeed = 0.9
+    v29.Volume = 5
+
+    v29:Play()
+end)
+v27:SetCallback('OnStartMoving', function()
+    print('Entity has started moving')
+end)
+v27:SetCallback('OnEnterRoom', function(p30, p31)
+    if p31 == true then
+        print('Entity has entered room: ' .. p30.Name .. ' for the first time')
+    else
+        print('Entity has entered room: ' .. p30.Name .. ' again')
+    end
+end)
+v27:SetCallback('OnLookAt', function(p32)
+    if p32 == true then
+        print('Player is looking at entity')
+    else
+        print('Player view is obstructed by something')
+    end
+end)
+v27:SetCallback('OnRebounding', function(p33)
+    if p33 == true then
+        print('Entity has started rebounding')
+    else
+        print('Entity has finished rebounding')
+    end
+end)
+v27:SetCallback('OnDespawning', function()
+    print('Entity is despawning')
+end)
+v27:SetCallback('OnDespawned', function()
+    print('Entity has despawned')
+end)
+v27:SetCallback('OnDamagePlayer', function(p34)
+    if p34 == 0 then
+        print('Entity has killed the player')
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Guestly-V2-2/Random-Stuffs/refs/heads/main/Forboundjump'))()
+    else
+        print('Entity has damaged the player')
+    end
+end)
+v27:Run()
+game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+wait(2)
+
+local v24 = loadstring(game:HttpGet('https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Doors/Entity%20Spawner/V2/Source.lua'))().Create
+local v25 = {
+    Entity = {
+        Name = 'Re-Rebound',
+        Asset = 'rbxassetid://82116817846987',
+        HeightOffset = 0,
+    },
+}
+local v26 = {
+    Flicker = {
+        Enabled = false,
+        Duration = 7,
+    },
+    Shatter = false,
+    Repair = false,
+}
+
+v25.Lights = v26
+v25.Earthquake = {Enabled = false}
+v25.CameraShake = {
+    Enabled = true,
+    Range = 150,
+    Values = {
+        4,
+        4,
+        3,
+        3,
+    },
+}
+v25.Movement = {
+    Speed = 90,
+    Delay = 3,
+    Reversed = true,
+}
+v25.Rebounding = {
+    Enabled = false,
+    Type = 'Ambush',
+    Min = 2,
+    Max = 4,
+    Delay = 7,
+}
+v25.Damage = {
+    Enabled = true,
+    Range = 40,
+    Amount = 125,
+}
+v25.Crucifixion = {
+    Enabled = true,
+    Range = 40,
+    Resist = false,
+    Break = true,
+}
+v25.Death = {
+    Type = 'Guiding',
+    Hints = {
+        'You dead to who called Rebound',
+        'He is a looper',
+        'He will loop 4 times every next 4 doors',
+        'Watch out every his moves',
+    },
+    Cause = '',
+}
+
+local v27 = v24(v25)
+
+v27:SetCallback('OnSpawned', function()
+    print('Entity has spawned')
+
+    local v29 = Instance.new('Sound')
+
+    v29.Parent = game.Workspace
+    v29.Name = 'Spawn'
+    v29.SoundId = 'rbxassetid://9114221327'
+    v29.PlaybackSpeed = 0.9
+    v29.Volume = 5
+
+    v29:Play()
+end)
+v27:SetCallback('OnStartMoving', function()
+    print('Entity has started moving')
+end)
+v27:SetCallback('OnEnterRoom', function(p30, p31)
+    if p31 == true then
+        print('Entity has entered room: ' .. p30.Name .. ' for the first time')
+    else
+        print('Entity has entered room: ' .. p30.Name .. ' again')
+    end
+end)
+v27:SetCallback('OnLookAt', function(p32)
+    if p32 == true then
+        print('Player is looking at entity')
+    else
+        print('Player view is obstructed by something')
+    end
+end)
+v27:SetCallback('OnRebounding', function(p33)
+    if p33 == true then
+        print('Entity has started rebounding')
+    else
+        print('Entity has finished rebounding')
+    end
+end)
+v27:SetCallback('OnDespawning', function()
+    print('Entity is despawning')
+end)
+v27:SetCallback('OnDespawned', function()
+    print('Entity has despawned')
+end)
+v27:SetCallback('OnDamagePlayer', function(p34)
+    if p34 == 0 then
+        print('Entity has killed the player')
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/Guestly-V2-2/Random-Stuffs/refs/heads/main/Forboundjump'))()
+    else
+        print('Entity has damaged the player')
+    end
+end)
+v27:Run()
