@@ -1,0 +1,105 @@
+-- BẢN GỘP 5 SCRIPT (CẬP NHẬT LOGIC CỬA PHÂN LOẠI MÀU)
+-- ---------------------------------------------------------
+
+-- Script 1: Load Map Floor 2
+task.spawn(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/trungdepth-dot/Floor-2/refs/heads/main/Floor-2-mapp"))()
+end)
+
+-- Script 2: Chỉnh Lighting (Ánh sáng và Sương mù)
+task.spawn(function()
+    local Lighting = game:GetService("Lighting")
+    Lighting.FogColor = Color3.fromRGB(25, 20, 45) 
+    Lighting.FogStart = 0
+    Lighting.FogEnd = 60 
+    Lighting.ClockTime = 0 
+    Lighting.Brightness = 0.5 
+    Lighting.GlobalShadows = true
+    Lighting.ExposureCompensation = -0.5 
+    Lighting.Ambient = Color3.fromRGB(15, 12, 25) 
+    Lighting.OutdoorAmbient = Color3.fromRGB(5, 5, 10)
+
+    for _, object in pairs(workspace:GetDescendants()) do
+        if object:IsA("BasePart") and (object.Name == "LightPart" or object.Name == "Lamp") then
+            local pointLight = Instance.new("PointLight")
+            pointLight.Color = Color3.fromRGB(255, 190, 110)
+            pointLight.Brightness = 1.8 
+            pointLight.Range = 14 
+            pointLight.Shadows = true 
+            pointLight.Parent = object
+            object.Material = Enum.Material.Neon
+            object.Transparency = 0.2
+        end
+    end
+
+    local colorCorrection = Lighting:FindFirstChild("GameColor") or Instance.new("ColorCorrectionEffect", Lighting)
+    colorCorrection.Name = "GameColor"
+    colorCorrection.Contrast = 0.1 
+    colorCorrection.Saturation = -0.05
+end)
+
+-- Script 3: Âm thanh nền (Spawn Sound)
+task.spawn(function()
+    local cue2 = Instance.new("Sound")
+    cue2.Parent = game.Workspace
+    cue2.Name = "Spawn"
+    cue2.SoundId = "rbxassetid://9113731836"
+    cue2.Volume = 1
+    cue2.PlaybackSpeed = 1
+    cue2.Looped = true
+    cue2:Play()
+end)
+
+-- Script 4: Đổi màu cửa (Phân loại cửa chính/cửa phụ)
+task.spawn(function()
+    local Color_MainDoor   = Color3.fromRGB(141, 123, 110) -- cửa chính có số
+    local Color_SideDoor   = Color3.fromRGB(60, 60, 60)    -- cửa phụ / cửa trơn
+    local DoorMaterial     = Enum.Material.Limestone
+
+    -- Kiểm tra cửa có bảng số hay không
+    local function DoorHasNumber(door)
+        for _, obj in pairs(door:GetDescendants()) do
+            if obj:IsA("Decal")
+            or obj:IsA("SurfaceGui")
+            or obj:IsA("BillboardGui")
+            or string.find(obj.Name:lower(), "number")
+            or string.find(obj.Name:lower(), "sign") then
+                return true
+            end
+        end
+        return false
+    end
+
+    local function ConvertRoom(Room)
+        task.wait(1.5)
+        if not Room:IsA("Model") then return end
+
+        for _, door in pairs(Room:GetDescendants()) do
+            if door.Name == "Door" and door:IsA("BasePart") then
+                local hasNumber = DoorHasNumber(door)
+
+                -- Chọn màu theo loại cửa
+                local targetColor = hasNumber and Color_MainDoor or Color_SideDoor
+
+                door.Color = targetColor
+                door.Material = DoorMaterial
+
+                -- Áp dụng cho các phần con của cửa
+                for _, child in pairs(door:GetDescendants()) do
+                    if child:IsA("BasePart") then
+                        child.Color = targetColor
+                        child.Material = DoorMaterial
+                    end
+                end
+            end
+        end
+    end
+
+    -- Khi phòng mới được tạo
+    workspace.CurrentRooms.ChildAdded:Connect(ConvertRoom)
+
+    -- Áp dụng cho các phòng đã tồn tại
+    for _, room in pairs(workspace.CurrentRooms:GetChildren()) do
+        ConvertRoom(room)
+    end
+end)
