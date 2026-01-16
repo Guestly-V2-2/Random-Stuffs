@@ -1,6 +1,5 @@
 -- =========================
--- RANDOM OBJECT SPAWNER
--- DOORS - FIX MODEL TWEEN
+-- DOORS FULL ENTITY EFFECT SCRIPT
 -- =========================
 
 -- 🔧 ASSET ID
@@ -19,10 +18,13 @@ local ExtraHeight = 0.1
 local MaxTiltAngle = 25
 local AllowYaw = true
 
--- 💡 LIGHT
-local LightColor = Color3.fromRGB(255,0,0)
+-- 💡 OBJECT LIGHT
+local LightColor = Color3.fromRGB(255, 0, 0)
 local LightRange = 5
 local LightBrightness = 3
+
+-- 🔴 NEON COLOR
+local NeonColor = Color3.fromRGB(255, 0, 0)
 
 -- ⏱ RISE
 local MinRiseTime = 1
@@ -33,7 +35,262 @@ local RiseDepth = 6
 local ShakeDuration = 2
 local ShakeIntensity = 0.15
 
+-- 🔊 RISE SOUND (NO LOOP)
+local RiseSoundId = "rbxassetid://3475534419"
+local RiseSoundVolume = 2
+local RiseSoundPlaybackSpeed = 1
+
 -- =========================
+-- SERVICES
+-- =========================
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local Camera = workspace.CurrentCamera
+
+-- =========================
+-- CAMERA SHAKE (ANTI FREEZE)
+-- =========================
+
+local function CameraShake(duration, intensity)
+    local startTime = tick()
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        if tick() - startTime >= duration then
+            conn:Disconnect()
+            return
+        end
+        Camera.CFrame = Camera.CFrame * CFrame.new(
+            (math.random() - 0.5) * intensity,
+            (math.random() - 0.5) * intensity,
+            0
+        )
+    end)
+end
+
+-- =========================
+-- CURRENT ROOM
+-- =========================
+
+local function GetCurrentRoom()
+    local id = ReplicatedStorage.GameData.LatestRoom.Value
+    return workspace.CurrentRooms:FindFirstChild(tostring(id))
+end
+
+-- =========================
+-- FLOOR POSITION
+-- =========================
+
+local function GetRandomFloorCFrame(room)
+    local floors = {}
+    for _, v in ipairs(room:GetDescendants()) do
+        if v:IsA("BasePart") and v.Name == "Floor" then
+            table.insert(floors, v)
+        end
+    end
+    if #floors == 0 then return end
+
+    local f = floors[math.random(#floors)]
+    local size = f.Size
+    return f.CFrame * CFrame.new(
+        (math.random() - 0.5) * size.X,
+        0,
+        (math.random() - 0.5) * size.Z
+    )
+end
+
+-- =========================
+-- ROTATION
+-- =========================
+
+local function RandomRotation()
+    return CFrame.Angles(
+        math.rad(math.random(-MaxTiltAngle, MaxTiltAngle)),
+        AllowYaw and math.rad(math.random(0, 360)) or 0,
+        math.rad(math.random(-MaxTiltAngle, MaxTiltAngle))
+    )
+end
+
+-- =========================
+-- OBJECT LIGHT
+-- =========================
+
+local function AddLight(model)
+    local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
+    if not part then return end
+
+    local light = Instance.new("PointLight")
+    light.Color = LightColor
+    light.Range = LightRange
+    light.Brightness = LightBrightness
+    light.Parent = part
+end
+
+-- =========================
+-- RISE SOUND
+-- =========================
+
+local function AddRiseSound(part)
+    if not part then return end
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = RiseSoundId
+    sound.Volume = RiseSoundVolume
+    sound.PlaybackSpeed = RiseSoundPlaybackSpeed
+    sound.Looped = false
+    sound.Parent = part
+    return sound
+end
+
+-- =========================
+-- BREAK LIGHTS (OPENED ROOMS)
+-- =========================
+
+local function BreakLightsInOpenedRooms()
+    local latestRoom = ReplicatedStorage.GameData.LatestRoom.Value
+
+    for _, room in ipairs(workspace.CurrentRooms:GetChildren()) do
+        local roomId = tonumber(room.Name)
+        if roomId and roomId <= latestRoom then
+            local assets = room:FindFirstChild("Assets")
+            if assets then
+                local fixtures = assets:FindFirstChild("Light_Fixtures")
+                if fixtures then
+                    for _, obj in ipairs(fixtures:GetDescendants()) do
+                        if obj:IsA("PointLight")
+                        or obj:IsA("SurfaceLight")
+                        or obj:IsA("SpotLight") then
+                            obj.Enabled = false
+                            obj:Destroy()
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- =========================
+-- CHANGE NEON COLOR
+-- =========================
+
+local function ChangeNeonInOpenedRooms()
+    local latestRoom = ReplicatedStorage.GameData.LatestRoom.Value
+
+    for _, room in ipairs(workspace.CurrentRooms:GetChildren()) do
+        local roomId = tonumber(room.Name)
+        if roomId and roomId <= latestRoom then
+            local assets = room:FindFirstChild("Assets")
+            if assets then
+                local fixtures = assets:FindFirstChild("Light_Fixtures")
+                if fixtures then
+                    for _, fixture in ipairs(fixtures:GetChildren()) do
+                        local lf = fixture:FindFirstChild("LightFixture")
+                        if lf then
+                            local neon = lf:FindFirstChild("Neon")
+                            if neon and neon:IsA("BasePart") then
+                                neon.Material = Enum.Material.Neon
+                                neon.Color = NeonColor
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
+-- =========================
+-- REMOVE CHANDELIER (NEW)
+-- =========================
+
+local function RemoveChandeliersInOpenedRooms()
+    local latestRoom = ReplicatedStorage.GameData.LatestRoom.Value
+
+    for _, room in ipairs(workspace.CurrentRooms:GetChildren()) do
+        local roomId = tonumber(room.Name)
+        if roomId and roomId <= latestRoom then
+            local assets = room:FindFirstChild("Assets")
+            if assets then
+                local chandelier = assets:FindFirstChild("Chandelier")
+                if chandelier then
+                    chandelier:Destroy()
+                end
+            end
+        end
+    end
+end
+
+-- =========================
+-- SPAWN OBJECT
+-- =========================
+
+local function SpawnRandomObject()
+    local room = GetCurrentRoom()
+    if not room then return end
+
+    local model = game:GetObjects(AssetIds[math.random(#AssetIds)])[1]
+    if not model then return end
+    model.Parent = room
+
+    model.PrimaryPart = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
+    if not model.PrimaryPart then return end
+
+    local baseCF = GetRandomFloorCFrame(room)
+    if not baseCF then return end
+
+    local _, size = model:GetBoundingBox()
+    local rot = RandomRotation()
+
+    local startCF = baseCF * CFrame.new(0, -(size.Y/2 + RiseDepth), 0) * rot
+    local endCF   = baseCF * CFrame.new(0,  (size.Y/2 + ExtraHeight), 0) * rot
+
+    model:PivotTo(startCF)
+
+    local sound = AddRiseSound(model.PrimaryPart)
+    if sound then sound:Play() end
+
+    local alpha = Instance.new("NumberValue")
+    alpha.Value = 0
+
+    TweenService:Create(
+        alpha,
+        TweenInfo.new(
+            math.random() * (MaxRiseTime - MinRiseTime) + MinRiseTime,
+            Enum.EasingStyle.Quint,
+            Enum.EasingDirection.Out
+        ),
+        { Value = 1 }
+    ):Play()
+
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        model:PivotTo(startCF:Lerp(endCF, alpha.Value))
+        if alpha.Value >= 1 then
+            if sound then sound:Destroy() end
+            conn:Disconnect()
+            alpha:Destroy()
+        end
+    end)
+
+    AddLight(model)
+end
+
+-- =========================
+-- RUN
+-- =========================
+
+CameraShake(ShakeDuration, ShakeIntensity)
+ChangeNeonInOpenedRooms()
+BreakLightsInOpenedRooms()
+RemoveChandeliersInOpenedRooms()
+
+for i = 1, SpawnCount do
+    SpawnRandomObject()
+    task.wait(SpawnDelay)
+end
 -- SERVICES
 -- =========================
 
