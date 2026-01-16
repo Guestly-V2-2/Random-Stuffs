@@ -1,0 +1,15 @@
+replicatesignal(game.Players.LocalPlayer.Kill)
+
+-- ================= DEATH HINT =================
+firesignal(
+    game.ReplicatedStorage.RemotesFolder.DeathHint.OnClientEvent,
+    {
+        "You died to who called Delt..",
+        "Maybe.. He is just like Surge, but slower.",
+        "Just do what you learnt from Surge. Good luck."
+    },
+    "Blue"
+)
+
+game.ReplicatedStorage.GameStats["Player_" .. player.Name]
+    .Total.DeathCause.Value = "Delt"
