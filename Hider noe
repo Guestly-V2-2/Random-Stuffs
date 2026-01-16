@@ -1,0 +1,193 @@
+-- =========================
+-- RANDOM OBJECT SPAWNER
+-- DOORS - FIX MODEL TWEEN
+-- =========================
+
+-- 🔧 ASSET ID
+local AssetIds = {
+    "rbxassetid://11205614607",
+    "rbxassetid://11205614607",
+    "rbxassetid://11205614607",
+}
+
+-- ⚙️ CONFIG
+local SpawnCount  = 3
+local SpawnDelay  = 0.05
+local ExtraHeight = 0.1
+
+-- 🔄 ROTATION
+local MaxTiltAngle = 25
+local AllowYaw = true
+
+-- 💡 LIGHT
+local LightColor = Color3.fromRGB(255,0,0)
+local LightRange = 5
+local LightBrightness = 3
+
+-- ⏱ RISE
+local MinRiseTime = 1
+local MaxRiseTime = 2
+local RiseDepth = 6
+
+-- 📷 CAMERA SHAKE
+local ShakeDuration = 2
+local ShakeIntensity = 0.15
+
+-- =========================
+-- SERVICES
+-- =========================
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local Camera = workspace.CurrentCamera
+
+-- =========================
+-- CAMERA SHAKE
+-- =========================
+
+local function CameraShake(duration, intensity)
+    local start = tick()
+    local baseCF = Camera.CFrame
+
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        local t = tick() - start
+        if t >= duration then
+            Camera.CFrame = baseCF
+            conn:Disconnect()
+            return
+        end
+
+        Camera.CFrame = baseCF * CFrame.new(
+            (math.random()-0.5)*intensity,
+            (math.random()-0.5)*intensity,
+            0
+        )
+    end)
+end
+
+-- =========================
+-- CURRENT ROOM
+-- =========================
+
+local function GetCurrentRoom()
+    local id = ReplicatedStorage.GameData.LatestRoom.Value
+    return workspace.CurrentRooms:FindFirstChild(tostring(id))
+end
+
+-- =========================
+-- FLOOR POSITION
+-- =========================
+
+local function GetRandomFloorCFrame(room)
+    local floors = {}
+    for _,v in ipairs(room:GetDescendants()) do
+        if v:IsA("BasePart") and v.Name == "Floor" then
+            table.insert(floors, v)
+        end
+    end
+    if #floors == 0 then return end
+
+    local f = floors[math.random(#floors)]
+    local size = f.Size
+    return f.CFrame * CFrame.new(
+        (math.random()-0.5)*size.X,
+        0,
+        (math.random()-0.5)*size.Z
+    )
+end
+
+-- =========================
+-- ROTATION
+-- =========================
+
+local function RandomRotation()
+    return CFrame.Angles(
+        math.rad(math.random(-MaxTiltAngle, MaxTiltAngle)),
+        AllowYaw and math.rad(math.random(0,360)) or 0,
+        math.rad(math.random(-MaxTiltAngle, MaxTiltAngle))
+    )
+end
+
+-- =========================
+-- LIGHT
+-- =========================
+
+local function AddLight(model)
+    local part = model.PrimaryPart or model:FindFirstChildWhichIsA("BasePart", true)
+    if not part then return end
+
+    local l = Instance.new("PointLight")
+    l.Color = LightColor
+    l.Range = LightRange
+    l.Brightness = LightBrightness
+    l.Parent = part
+end
+
+-- =========================
+-- SPAWN OBJECT (FIXED)
+-- =========================
+
+local function SpawnRandomObject()
+    local room = GetCurrentRoom()
+    if not room then return end
+
+    local asset = AssetIds[math.random(#AssetIds)]
+    local model = game:GetObjects(asset)[1]
+    if not model then return end
+    model.Parent = room
+
+    -- Ensure PrimaryPart
+    if not model.PrimaryPart then
+        model.PrimaryPart = model:FindFirstChildWhichIsA("BasePart", true)
+    end
+    if not model.PrimaryPart then return end
+
+    local baseCF = GetRandomFloorCFrame(room)
+    if not baseCF then return end
+
+    local _, size = model:GetBoundingBox()
+    local rot = RandomRotation()
+
+    local startCF = baseCF * CFrame.new(0, -(size.Y/2 + RiseDepth), 0) * rot
+    local endCF   = baseCF * CFrame.new(0,  (size.Y/2 + ExtraHeight), 0) * rot
+
+    model:PivotTo(startCF)
+
+    local riseTime = math.random()*(MaxRiseTime-MinRiseTime)+MinRiseTime
+    local alpha = Instance.new("NumberValue")
+    alpha.Value = 0
+
+    local tween = TweenService:Create(
+        alpha,
+        TweenInfo.new(riseTime, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+        {Value = 1}
+    )
+
+    tween:Play()
+
+    local conn
+    conn = RunService.RenderStepped:Connect(function()
+        model:PivotTo(startCF:Lerp(endCF, alpha.Value))
+        if alpha.Value >= 1 then
+            conn:Disconnect()
+            alpha:Destroy()
+        end
+    end)
+
+    AddLight(model)
+end
+
+-- =========================
+-- RUN
+-- =========================
+
+CameraShake(ShakeDuration, ShakeIntensity)
+
+for i = 1, SpawnCount do
+    SpawnRandomObject()
+    task.wait(SpawnDelay)
+end
