@@ -1,37 +1,73 @@
-coroutine.wrap(function()
-    local LightReplaceModel = game:GetObjects("rbxassetid://137958338882045")[1]
-    if not LightReplaceModel then return end
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
 
-    local function replaceLights()
-        local latestRoomId = game:GetService("ReplicatedStorage").GameData.LatestRoom.Value
-        local room = workspace.CurrentRooms:FindFirstChild(latestRoomId)
-        if not room then return end
+local frameCounter = 0
+local FRAME_INTERVAL = 30
 
-        local fixtures = room:FindFirstChild("Assets") and room.Assets:FindFirstChild("Light_Fixtures")
-        if not fixtures then return end
+local replacedWalls = {}
 
-        for _, v in pairs(fixtures:GetDescendants()) do
-            if v:IsA("Model") and (v.Name == "LightStand" or v.Name == "LightStandSingle") then
-                local pivot = v:GetPivot()
-                v:Destroy()
+local WallColor = Color3.fromRGB(64, 0, 128)
+local WallMaterial = Enum.Material.DiamondPlate
 
-                local newLight = LightReplaceModel:Clone()
-                for _, part in pairs(newLight:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.Anchored = true
-                    end
-                end
+local GlassColor = Color3.fromRGB(128, 0, 222)
+local GlassMaterial = Enum.Material.Slate
 
-                newLight:PivotTo(pivot)
-                newLight.Parent = fixtures
+local function ReplaceWallAndGlass(room)
+    for _, obj in pairs(room:GetDescendants()) do
+        if obj:IsA("BasePart") and not replacedWalls[obj] then
+            if obj.Name == "Wall" then
+                obj.Color = WallColor
+                obj.Material = WallMaterial
+                replacedWalls[obj] = true
+            elseif obj.Name:lower():find("glass") then
+                obj.Color = GlassColor
+                obj.Material = GlassMaterial
+                replacedWalls[obj] = true
             end
         end
     end
+end
 
-    replaceLights()
+local replacedLights = {}
+local LightReplaceModel = game:GetObjects("rbxassetid://79581799582852")[1]
 
-    game.ReplicatedStorage.GameData.LatestRoom.Changed:Connect(function()
-        task.wait(0.5)
-        replaceLights()
-    end)
-end)()
+local function AnchorAndNoCollision(model)
+    for _, part in pairs(model:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.Anchored = true
+            part.CanCollide = false
+        end
+    end
+end
+
+local function ReplaceLights(room)
+    if not room:FindFirstChild("Assets") then return end
+
+    for _, obj in pairs(room.Assets:GetDescendants()) do
+        if (obj.Name == "LightStand" or obj.Name == "LightStandSingle")
+        and not replacedLights[obj] then
+            local pivot = obj:GetPivot()
+            local parent = obj.Parent
+            obj:Destroy()
+
+            local torch = LightReplaceModel:Clone()
+            torch.Name = "Torch"
+            torch.Parent = parent
+            torch:PivotTo(pivot)
+            AnchorAndNoCollision(torch)
+
+            replacedLights[torch] = true
+        end
+    end
+end
+
+RunService.Heartbeat:Connect(function()
+    frameCounter += 1
+    if frameCounter < FRAME_INTERVAL then return end
+    frameCounter = 0
+
+    for _, room in pairs(Workspace.CurrentRooms:GetChildren()) do
+        ReplaceWallAndGlass(room)
+        ReplaceLights(room)
+    end
+end)
