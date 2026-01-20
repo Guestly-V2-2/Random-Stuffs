@@ -1,0 +1,26 @@
+local part = Instance.new("Part")
+part.Size = Vector3.new(5, 5, 5)
+part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, 0, -15)
+part.Anchored = true
+part.Transparency = 1
+part.CanCollide = false
+part.CastShadow = false
+part.Parent = workspace
+local light = Instance.new("PointLight", part)
+light.Range = 8
+light.Brightness = 3
+light.Color = Color3.fromRGB(255, 0, 0)
+
+local billboard = Instance.new("BillboardGui")
+billboard.Size = UDim2.new(5, 0, 5, 0)
+billboard.AlwaysOnTop = true
+billboard.Size = UDim2.new(15, 0, 15, 0)
+billboard.SizeOffset = Vector2.new(0, 0.3)
+billboard.Parent = part
+billboard.Adornee = part
+
+local imageLabel = Instance.new("ImageLabel")
+imageLabel.Size = UDim2.new(1, 0, 1, 0)
+imageLabel.BackgroundTransparency = 1
+imageLabel.Image = "rbxassetid://126389464981585"
+imageLabel.Parent = billboard
