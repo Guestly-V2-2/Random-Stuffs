@@ -1,0 +1,154 @@
+workspace.CurrentRooms[game.ReplicatedStorage.GameData.LatestRoom.Value].Door.ClientOpen:Destroy()
+
+--// SERVICES
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+
+--// CONFIG
+local HOLD_TIME = 10
+local FADE_TIME = 1
+
+--// PHASE STATE
+local PHASE = "FAKE" -- FAKE → TRANSITION → REAL → DONE
+
+--// GET ROOM
+local roomId = ReplicatedStorage.GameData.LatestRoom.Value
+local room = workspace.CurrentRooms:FindFirstChild(tostring(roomId))
+if not room then return end
+
+--// GET SIGN
+local sign = room.Door.Sign
+
+--// COLLECT TEXTLABELS
+local textLabels = {}
+for _, obj in ipairs(sign:GetDescendants()) do
+    if obj:IsA("TextLabel") then
+        table.insert(textLabels, obj)
+    end
+end
+if #textLabels == 0 then return end
+
+--// GET REAL NUMBER
+local realNumber = tonumber(textLabels[1].Text)
+if not realNumber then return end
+
+local realText = string.format("%04d", realNumber)
+local fakeText = string.format("%04d", realNumber + math.random(1, 3))
+
+--// STORE ORIGINAL PROPERTIES
+local original = {}
+for _, lbl in ipairs(textLabels) do
+    original[lbl] = {
+        Text = lbl.Text,
+        Transparency = lbl.TextTransparency
+    }
+end
+
+--// HARD TWEEN KILL
+local function KillTweens()
+    for _, lbl in ipairs(textLabels) do
+        TweenService:Create(lbl, TweenInfo.new(0), {
+            TextTransparency = lbl.TextTransparency
+        }):Play()
+    end
+end
+
+--// FADE FUNCTION (SAFE)
+local function Fade(target, time)
+    KillTweens()
+    local info = TweenInfo.new(time, Enum.EasingStyle.Linear)
+    for _, lbl in ipairs(textLabels) do
+        TweenService:Create(lbl, info, {
+            TextTransparency = target
+        }):Play()
+    end
+end
+
+--// =========================
+--// 🔌 HOOK ZONE (1 LẦN)
+--// =========================
+local function OnFakeStart(ctx)
+    game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+game.Players.LocalPlayer.Character.Humanoid:TakeDamage(125)
+firesignal(game.ReplicatedStorage.RemotesFolder.DeathHint.OnClientEvent, {"Mhm.. i see, Door Faker.","Something gone wrong with the door.","Did you notice that?"},"Blue")
+                game.ReplicatedStorage.GameStats["Player_".. game.Players.LocalPlayer.Name].Total.DeathCause.Value = "Door Faker"
+end
+
+local function OnRealFadeIn(ctx)
+    game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+-- One-time execute guard
+if getgenv()._DOOR_ALREADY_EXECUTED then
+    warn("[SCRIPT] Script đã được chạy trước đó, từ chối execute!")
+    return
+end
+
+getgenv()._DOOR_ALREADY_EXECUTED = true
+
+-- ======================
+-- SCRIPT CHÍNH BẮT ĐẦU Ở ĐÂY
+-- ======================
+
+print("[SCRIPT] Execute lần đầu thành công!")
+
+local achievementGiver = loadstring(game:HttpGet("https://raw.githubusercontent.com/Voor-Pr00/Achivements/refs/heads/main/Voorpr0"))()
+
+---====== Display achievement ======---
+achievementGiver({
+    Title = "Wrong Numbers",
+    Desc = "Something gone wrong..",
+    Reason = "Encounter Door Faker",
+    Image = "rbxassetid://125464229732123"
+})
+end
+
+--// =========================
+--// APPLY FAKE (LOCK)
+--// =========================
+for _, lbl in ipairs(textLabels) do
+    lbl.Text = fakeText
+    lbl.TextTransparency = 0
+end
+
+OnFakeStart({
+    fakeText = fakeText,
+    roomId = roomId,
+    textLabels = textLabels
+})
+
+--// =========================
+--// MAIN TIMELINE (KHÔNG LOOP)
+--// =========================
+task.delay(HOLD_TIME, function()
+    if PHASE ~= "FAKE" then return end
+    PHASE = "TRANSITION"
+
+    -- FADE OUT FAKE
+    Fade(1, FADE_TIME)
+
+    task.delay(FADE_TIME, function()
+        if PHASE ~= "TRANSITION" then return end
+
+        -- 🔴 KILL FAKE QUYỀN ĐIỀU KHIỂN
+        PHASE = "REAL"
+
+        -- SET REAL (ẨN)
+        for _, lbl in ipairs(textLabels) do
+            lbl.Text = realText
+            lbl.TextTransparency = 1
+        end
+
+        -- FADE IN REAL
+        Fade(0, FADE_TIME)
+
+        OnRealFadeIn({
+            realText = realText,
+            roomId = roomId,
+            textLabels = textLabels
+        })
+
+        task.delay(FADE_TIME, function()
+            PHASE = "DONE"
+            table.clear(textLabels)
+        end)
+    end)
+end)
