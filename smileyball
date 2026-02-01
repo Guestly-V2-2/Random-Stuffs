@@ -13,3 +13,5 @@ eyes.Parent = workspace
 eyes["Dreamcore Ice Cream"].Volume = 1.1
 eyes["Dreamcore Ice Cream"].Looped = true
 eyes.Size = Vector3.new(8,8,8)
+local light = Instance.new("PointLight", eyes)
+light.Range = 5
