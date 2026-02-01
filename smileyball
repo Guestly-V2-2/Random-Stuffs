@@ -1,0 +1,15 @@
+local num=0
+local currentLoadedRoom = workspace.CurrentRooms[game:GetService("ReplicatedStorage").GameData.LatestRoom.Value]
+if currentLoadedRoom:FindFirstChild("Nodes") then
+   num = math.floor(#currentLoadedRoom.Nodes:GetChildren()/2)
+end
+
+local eyes=game:GetObjects("rbxassetid://119645743419086")[1]
+eyes.CFrame=(
+    num==0 and currentLoadedRoom[currentLoadedRoom.Name] or currentLoadedRoom.Nodes[num]
+).CFrame + Vector3.new(0, 4, 0)
+
+eyes.Parent = workspace
+eyes["Dreamcore Ice Cream"].Volume = 1.1
+eyes["Dreamcore Ice Cream"].Looped = true
+eyes.Size = Vector3.new(8,8,8)
